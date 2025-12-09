@@ -54,8 +54,8 @@ const Hero = () => {
 
           <div className="bg-background/60 border border-border rounded-xl p-6 shadow-lg backdrop-blur-sm text-lg md:text-xl text-muted-foreground">
             <p className="leading-relaxed text-center">
-              Di kelas ini, kita kupas tuntas sisi gelap dunia funding: pola psikologi
-              yang digunakan profit firm, jebakan aturan yang tak terlihat, dan bagaimana
+              Di kelas ini, kita kupas tuntas <span className="italic">sisi gelap dunia funding</span>: pola psikologi
+              yang digunakan profit firm, <span className="italic">jebakan aturan yang tak terlihat</span>, dan bagaimana
               mengubah mindset serta sistem Anda agar konsisten lolos dan menikmati payout.
             </p>
           </div>
