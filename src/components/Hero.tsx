@@ -89,48 +89,48 @@ const Hero = () => {
           <h3 className="text-foreground font-semibold mb-4">Apa yang Anda Dapatkan Saat Bergabung:</h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-amber-200 bg-gradient-to-r from-amber-50/30 to-transparent">
-              <div className="flex-none w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center font-semibold">1</div>
+            <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/30 hover:scale-105 transition-transform duration-200">
+              <div className="flex-none w-10 h-10 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold">1</div>
               <div>
                 <p className="font-semibold text-foreground">Tools auto SnD</p>
                 <p className="text-sm text-muted-foreground">Rp 2.350.000</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-amber-200 bg-gradient-to-r from-amber-50/20 to-transparent">
-              <div className="flex-none w-10 h-10 rounded-full bg-amber-400 text-white flex items-center justify-center font-semibold">2</div>
+            <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
+              <div className="flex-none w-10 h-10 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold">2</div>
               <div>
                 <p className="font-semibold text-foreground">Calculate Risk Management</p>
                 <p className="text-sm text-muted-foreground">Rp 950.000</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-amber-200 bg-gradient-to-r from-amber-50/20 to-transparent">
-              <div className="flex-none w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center font-semibold">3</div>
+            <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
+              <div className="flex-none w-10 h-10 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold">3</div>
               <div>
                 <p className="font-semibold text-foreground">Akses Tools Journal Trading</p>
                 <p className="text-sm text-muted-foreground">Rp 450.000</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-amber-200 bg-gradient-to-r from-amber-50/20 to-transparent">
-              <div className="flex-none w-10 h-10 rounded-full bg-amber-400 text-white flex items-center justify-center font-semibold">4</div>
+            <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
+              <div className="flex-none w-10 h-10 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold">4</div>
               <div>
                 <p className="font-semibold text-foreground">Akses Journal Strategi Scalping Gold</p>
                 <p className="text-sm text-muted-foreground">Rp 850.000</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-amber-200 bg-gradient-to-r from-amber-50/20 to-transparent">
-              <div className="flex-none w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center font-semibold">5</div>
+            <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
+              <div className="flex-none w-10 h-10 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold">5</div>
               <div>
                 <p className="font-semibold text-foreground">EA Copyer Dua Arah</p>
                 <p className="text-sm text-muted-foreground">Rp 1.850.000</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-amber-200 bg-gradient-to-r from-amber-50/20 to-transparent">
-              <div className="flex-none w-10 h-10 rounded-full bg-amber-400 text-white flex items-center justify-center font-semibold">6</div>
+            <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
+              <div className="flex-none w-10 h-10 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold">6</div>
               <div>
                 <p className="font-semibold text-foreground">Akun Challenge Gratis ProFirm Two Step</p>
                 <p className="text-sm text-muted-foreground">$5,000 (akun challenge)</p>
@@ -139,7 +139,7 @@ const Hero = () => {
           </div>
 
           <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <p className="font-bold text-lg">TOTAL VALUE: <span className="text-amber-400">Rp. 7.700.000</span></p>
+            <p className="font-bold text-lg">TOTAL VALUE: <span className="text-amber-300">Rp. 7.700.000</span></p>
             <p className="text-muted-foreground">Biaya Kelas: klik tombol <span className="font-semibold">Daftar & Bayar</span> atau <span className="font-semibold">Bayar Sekarang</span> untuk menuju pembayaran.</p>
           </div>
         </div>
