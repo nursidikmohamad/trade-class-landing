@@ -15,7 +15,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#050406] via-[#070708] to-[#0b0b0d]">
       {/* Decorative Dots */}
       <div className="absolute top-20 left-10 w-3 h-3 bg-yellow-500 rounded-full opacity-60"></div>
       <div className="absolute top-40 right-20 w-2 h-2 bg-yellow-400 rounded-full opacity-50"></div>
@@ -24,7 +24,7 @@ const Hero = () => {
       <div className="absolute top-1/2 right-10 w-3 h-3 bg-yellow-500 rounded-full opacity-30"></div>
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-background/50" />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 py-20 text-center">
