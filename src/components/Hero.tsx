@@ -45,15 +45,15 @@ const Hero = () => {
         <div className="max-w-2xl mx-auto mb-10 space-y-4">
           <div className="bg-background/60 border border-border rounded-xl p-6 shadow-lg backdrop-blur-sm text-lg md:text-xl text-muted-foreground">
             <div className="leading-relaxed space-y-2 text-center">
-              <p>Ketahuilah Bahwa Ini bukan</p>
-              <p className="font-semibold">Sistem Tradingmu Yang Salah</p>
-              <p>Tapi Karena Kamu Belum Tahu</p>
+              <p className="text-white">Ketahuilah Bahwa Ini bukan</p>
+              <p className="font-semibold text-white">Sistem Tradingmu Yang Salah</p>
+              <p className="text-white">Tapi Karena Kamu Belum Tahu</p>
               <p className="font-semibold text-amber-200">Sisi Gelap Di Industri Prop Firm</p>
             </div>
           </div>
 
           <div className="bg-background/60 border border-border rounded-xl p-6 shadow-lg backdrop-blur-sm text-lg md:text-xl text-muted-foreground">
-            <p className="leading-relaxed text-center">
+            <p className="leading-relaxed text-center text-white">
               Di kelas ini, kita kupas tuntas <span className="italic">sisi gelap dunia funding</span>: pola psikologi
               yang digunakan profit firm, <span className="italic">jebakan aturan yang tak terlihat</span>, dan bagaimana
               mengubah mindset serta sistem Anda agar konsisten lolos dan menikmati payout.
