@@ -44,11 +44,12 @@ const Hero = () => {
 
         <div className="max-w-2xl mx-auto mb-10 space-y-4">
           <div className="bg-background/60 border border-border rounded-xl p-6 shadow-lg backdrop-blur-sm text-lg md:text-xl text-muted-foreground">
-            <p className="leading-relaxed">
-              Anda menonton ratusan video, ikut berbagai kelas, membeli strategi,
-              dan mencoba metode yang dianggap aman — namun setiap challenge hasilnya
-              tetap sama: overtrade, mental hancur, atau akun hangus saat hampir payout.
-            </p>
+            <div className="leading-relaxed space-y-2 text-left">
+              <p>Ketahuilah Bahwa Ini bukan</p>
+              <p className="font-semibold">Sistem Tradingmu Yang Salah</p>
+              <p>Tapi Karena Kamu Belum Tahu</p>
+              <p className="font-semibold text-amber-200">Sisi Gelap Di Industri Prop Firm</p>
+            </div>
           </div>
 
           <div className="bg-background/60 border border-border rounded-xl p-6 shadow-lg backdrop-blur-sm text-lg md:text-xl text-muted-foreground">
@@ -96,10 +97,8 @@ const Hero = () => {
             <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/30 hover:scale-105 transition-transform duration-200">
               <div className="flex-none w-12 h-12 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold text-lg">1</div>
               <div>
-                <p className="text-lg md:text-xl font-semibold text-foreground">Ketahuilah Bahwa Ini bukan</p>
-                <p className="text-lg md:text-xl font-semibold text-primary">Sistem Tradingmu Yang Salah</p>
-                <p className="text-lg md:text-xl text-foreground">Tapi Karena Kamu Belum Tahu</p>
-                <p className="text-lg md:text-xl font-semibold text-amber-200">Sisi Gelap Di Industri Prop Firm</p>
+                <p className="text-lg md:text-xl font-semibold text-foreground">Mengupas Sisi Gelap Industri Prop Firm</p>
+                <p className="text-base text-muted-foreground">Pelajari jebakan aturan dan psikologi yang sering bikin challenge gagal.</p>
               </div>
             </div>
 
