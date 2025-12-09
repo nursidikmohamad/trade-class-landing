@@ -80,7 +80,7 @@ const Hero = () => {
               <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">2</div>
               <div className="text-center">
                 <p className="text-lg md:text-xl font-semibold text-foreground">Calculate Risk Management</p>
-                <p className="text-base font-semibold text-amber-200">Rp 950.000</p>
+                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">Rp 950.000</p>
               </div>
             </div>
 
@@ -88,7 +88,7 @@ const Hero = () => {
               <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">3</div>
               <div className="text-center">
                 <p className="text-lg md:text-xl font-semibold text-foreground">Akses Tools Journal Trading</p>
-                <p className="text-base font-semibold text-amber-200">Rp 450.000</p>
+                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">Rp 450.000</p>
               </div>
             </div>
 
@@ -96,7 +96,7 @@ const Hero = () => {
               <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">4</div>
               <div className="text-center">
                 <p className="text-lg md:text-xl font-semibold text-foreground">Akses Journal Strategi Scalping Gold</p>
-                <p className="text-base font-semibold text-amber-200">Rp 850.000</p>
+                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">Rp 850.000</p>
               </div>
             </div>
 
@@ -104,7 +104,7 @@ const Hero = () => {
               <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">5</div>
               <div className="text-center">
                 <p className="text-lg md:text-xl font-semibold text-foreground">EA Copyer Dua Arah</p>
-                <p className="text-base font-semibold text-amber-200">Rp 1.850.000</p>
+                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">Rp 1.850.000</p>
               </div>
             </div>
 
@@ -112,7 +112,7 @@ const Hero = () => {
               <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">6</div>
               <div className="text-center">
                 <p className="text-lg md:text-xl font-semibold text-foreground">Akun Challenge Gratis ProFirm Two Step</p>
-                <p className="text-base font-semibold text-amber-200">$5,000 (akun challenge)</p>
+                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">$5,000 (akun challenge)</p>
               </div>
             </div>
           </div>
