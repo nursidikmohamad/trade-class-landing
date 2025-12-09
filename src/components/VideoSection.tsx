@@ -1,6 +1,26 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Play } from "lucide-react";
 
 const VideoSection = () => {
+  const [youtubeUrl, setYoutubeUrl] = useState("https://www.youtube.com/embed/dQw4w9WgXcQ");
+
+  useEffect(() => {
+    const fetchYoutubeUrl = async () => {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "youtube_url")
+        .maybeSingle();
+
+      if (!error && data) {
+        setYoutubeUrl(data.value);
+      }
+    };
+
+    fetchYoutubeUrl();
+  }, []);
+
   return (
     <section id="video" className="py-20 bg-card">
       <div className="container mx-auto px-6">
@@ -21,7 +41,7 @@ const VideoSection = () => {
           <div className="relative aspect-video bg-secondary border-4 border-border shadow-xl overflow-hidden group">
             <iframe
               className="w-full h-full"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              src={youtubeUrl}
               title="Preview Kelas Trading"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

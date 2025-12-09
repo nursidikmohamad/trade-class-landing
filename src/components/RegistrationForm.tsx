@@ -1,8 +1,17 @@
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Send, CheckCircle } from "lucide-react";
+import { z } from "zod";
+
+const formSchema = z.object({
+  nama: z.string().trim().min(1, "Nama wajib diisi").max(100),
+  email: z.string().trim().email("Format email tidak valid").max(255),
+  whatsapp: z.string().trim().min(10, "Nomor WhatsApp minimal 10 digit").max(15),
+  pengalaman: z.string().optional(),
+});
 
 const RegistrationForm = () => {
   const { toast } = useToast();
@@ -25,22 +34,11 @@ const RegistrationForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
-    if (!formData.nama.trim() || !formData.email.trim() || !formData.whatsapp.trim()) {
+    const validation = formSchema.safeParse(formData);
+    if (!validation.success) {
       toast({
         title: "Error",
-        description: "Mohon lengkapi semua field yang wajib diisi",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast({
-        title: "Error",
-        description: "Format email tidak valid",
+        description: validation.error.errors[0].message,
         variant: "destructive"
       });
       return;
@@ -48,8 +46,22 @@ const RegistrationForm = () => {
 
     setIsLoading(true);
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    const { error } = await supabase.from("registrations").insert({
+      name: formData.nama.trim(),
+      email: formData.email.trim(),
+      phone: formData.whatsapp.trim(),
+      experience: formData.pengalaman || null,
+    });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Gagal menyimpan data. Silakan coba lagi.",
+        variant: "destructive"
+      });
+      setIsLoading(false);
+      return;
+    }
     
     setIsLoading(false);
     setIsSubmitted(true);

@@ -36,8 +36,8 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                  Kebijakan Privasi
+                <a href="/auth" className="text-muted-foreground hover:text-primary transition-colors">
+                  Admin Login
                 </a>
               </li>
             </ul>
