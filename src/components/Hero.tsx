@@ -61,33 +61,7 @@ const Hero = () => {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button
-            size="lg"
-            onClick={scrollToForm}
-            className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
-          >
-            Daftar & Bayar
-          </Button>
-
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={scrollToVideo}
-            className="text-lg px-8 py-6 border-2 hover:-translate-y-1 transition-all"
-          >
-            Pelajari Lebih Lanjut
-          </Button>
-
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={goToPayment}
-            className="text-lg px-6 py-4 border-2 hover:-translate-y-1 transition-all hidden sm:inline-flex"
-          >
-            Bayar Sekarang
-          </Button>
-        </div>
+        {/* Buttons moved below TOTAL VALUE as requested */}
 
         {/* Benefits / Offer details (cards) */}
           <div className="mt-10 max-w-3xl mx-auto bg-muted/30 rounded-lg p-6 text-left text-sm md:text-base">
@@ -145,6 +119,34 @@ const Hero = () => {
           <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <p className="font-extrabold text-2xl md:text-3xl">TOTAL VALUE: <span className="text-amber-200">Rp. 7.700.000</span></p>
             <p className="text-muted-foreground">Biaya Kelas: klik tombol <span className="font-semibold">Daftar & Bayar</span> atau <span className="font-semibold">Bayar Sekarang</span> untuk menuju pembayaran.</p>
+          </div>
+          
+          <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              size="lg"
+              onClick={scrollToForm}
+              className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+            >
+              Daftar & Bayar
+            </Button>
+
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={scrollToVideo}
+              className="text-lg px-8 py-6 border-2 hover:-translate-y-1 transition-all"
+            >
+              Pelajari Lebih Lanjut
+            </Button>
+
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={goToPayment}
+              className="text-lg px-6 py-4 border-2 hover:-translate-y-1 transition-all hidden sm:inline-flex"
+            >
+              Bayar Sekarang
+            </Button>
           </div>
         </div>
 
