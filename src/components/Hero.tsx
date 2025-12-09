@@ -90,8 +90,8 @@ const Hero = () => {
         </div>
 
         {/* Benefits / Offer details (cards) */}
-        <div className="mt-10 max-w-3xl mx-auto bg-muted/30 rounded-lg p-6 text-left text-sm md:text-base">
-          <h3 className="text-foreground font-semibold mb-4">Apa yang Anda Dapatkan Saat Bergabung:</h3>
+          <div className="mt-10 max-w-3xl mx-auto bg-muted/30 rounded-lg p-6 text-left text-sm md:text-base">
+          <h3 className="mx-auto text-2xl md:text-3xl lg:text-4xl font-extrabold mb-6 bg-gradient-to-r from-amber-300 via-amber-200 to-white bg-clip-text text-transparent text-center">Apa yang Anda Dapatkan Saat Bergabung:</h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/30 hover:scale-105 transition-transform duration-200">
