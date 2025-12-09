@@ -21,11 +21,11 @@ const Hero = () => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 py-20 text-center">
         <p className="text-primary font-mono text-sm md:text-base uppercase tracking-widest mb-4 animate-pulse">
-          Kelas Trading Online #1 di Indonesia
+         KELAS TRADING PROFIRM TEBAIK DI INDONESIA
         </p>
         
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
-          Kuasai Dunia Trading<br />
+          Bongkar Sisi Sisi Gelap Trading Profirm<br />
           <span className="text-primary">Raih Profit Konsisten</span>
         </h1>
         
