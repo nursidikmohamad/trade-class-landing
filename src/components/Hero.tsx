@@ -38,17 +38,22 @@ const Hero = () => {
           <span className="text-primary">Pelajari Sisi Gelap Funding & Raih Payout</span>
         </h1>
 
-        <div className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 space-y-4">
-          <p>
-            Anda menonton ratusan video, ikut berbagai kelas, membeli strategi,
-            dan mencoba metode yang dianggap aman — namun setiap challenge hasilnya
-            tetap sama: overtrade, mental hancur, atau akun hangus saat hampir payout.
-          </p>
-          <p>
-            Di kelas ini, kita kupas tuntas sisi gelap dunia funding: pola psikologi
-            yang digunakan profit firm, jebakan aturan yang tak terlihat, dan bagaimana
-            mengubah mindset serta sistem Anda agar konsisten lolos dan menikmati payout.
-          </p>
+        <div className="max-w-2xl mx-auto mb-10 space-y-4">
+          <div className="bg-background/60 border border-border rounded-xl p-6 shadow-lg backdrop-blur-sm text-lg md:text-xl text-muted-foreground">
+            <p className="leading-relaxed">
+              Anda menonton ratusan video, ikut berbagai kelas, membeli strategi,
+              dan mencoba metode yang dianggap aman — namun setiap challenge hasilnya
+              tetap sama: overtrade, mental hancur, atau akun hangus saat hampir payout.
+            </p>
+          </div>
+
+          <div className="bg-background/60 border border-border rounded-xl p-6 shadow-lg backdrop-blur-sm text-lg md:text-xl text-muted-foreground">
+            <p className="leading-relaxed">
+              Di kelas ini, kita kupas tuntas sisi gelap dunia funding: pola psikologi
+              yang digunakan profit firm, jebakan aturan yang tak terlihat, dan bagaimana
+              mengubah mindset serta sistem Anda agar konsisten lolos dan menikmati payout.
+            </p>
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
