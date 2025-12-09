@@ -1,0 +1,27 @@
+name: Build & Notify Lovable
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch: {}
+
+jobs:
+  build-and-notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Notify Lovable webhook
+        if: ${{ secrets.LOVABLE_WEBHOOK_URL != '' }}
+        run: |
+          echo "Notifying Lovable..."
+          curl -sSf -X POST -H "Content-Type: application/json" \
+            -d '{"ref":"main","status":"built"}' "${{ secrets.LOVABLE_WEBHOOK_URL }}"
+        env:
+          NODE_ENV: production
