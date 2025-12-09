@@ -162,7 +162,7 @@ const Hero = () => {
             <p className="font-extrabold text-lg md:text-2xl">TOTAL VALUE:</p>
             <p className="text-amber-200">
               <span className="inline-block align-middle mr-2">Rp.</span>
-              <span className="inline-block align-middle text-2xl md:text-3xl font-extrabold">7.700.000</span>
+              <span className="inline-block align-middle text-2xl md:text-3xl font-extrabold text-amber-200 line-through decoration-red-500 decoration-2">7.700.000</span>
             </p>
           </div>
           
