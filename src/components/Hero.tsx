@@ -54,8 +54,8 @@ const Hero = () => {
 
           <div className="bg-background/60 border border-border rounded-xl p-6 shadow-lg backdrop-blur-sm text-lg md:text-xl text-muted-foreground">
             <p className="leading-relaxed text-center text-white">
-              Di kelas ini, kita kupas tuntas <span className="italic">sisi gelap dunia funding</span>: pola psikologi
-              yang digunakan profit firm, <span className="italic">jebakan aturan yang tak terlihat</span>, dan bagaimana
+              Di kelas ini, kita kupas tuntas <span className="italic text-amber-300">sisi gelap dunia funding</span>: pola psikologi
+              yang digunakan profit firm, <span className="italic text-amber-300">jebakan aturan yang tak terlihat</span>, dan bagaimana
               mengubah mindset serta sistem Anda agar konsisten lolos dan menikmati payout.
             </p>
           </div>
@@ -69,14 +69,15 @@ const Hero = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/30 hover:scale-105 transition-transform duration-200">
-              <div className="w-12 h-12 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold text-lg">1</div>
+              <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">1</div>
               <div className="text-center">
                 <p className="text-2xl md:text-3xl font-extrabold text-amber-200">Rp 2.350.000</p>
+                <p className="mt-1 text-sm text-muted-foreground">Tools auto SnD</p>
               </div>
             </div>
 
             <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
-              <div className="w-12 h-12 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold text-lg">2</div>
+              <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">2</div>
               <div className="text-center">
                 <p className="text-lg md:text-xl font-semibold text-foreground">Calculate Risk Management</p>
                 <p className="text-base font-semibold text-amber-200">Rp 950.000</p>
@@ -84,7 +85,7 @@ const Hero = () => {
             </div>
 
             <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
-              <div className="w-12 h-12 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold text-lg">3</div>
+              <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">3</div>
               <div className="text-center">
                 <p className="text-lg md:text-xl font-semibold text-foreground">Akses Tools Journal Trading</p>
                 <p className="text-base font-semibold text-amber-200">Rp 450.000</p>
@@ -92,7 +93,7 @@ const Hero = () => {
             </div>
 
             <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
-              <div className="w-12 h-12 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold text-lg">4</div>
+              <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">4</div>
               <div className="text-center">
                 <p className="text-lg md:text-xl font-semibold text-foreground">Akses Journal Strategi Scalping Gold</p>
                 <p className="text-base font-semibold text-amber-200">Rp 850.000</p>
@@ -100,7 +101,7 @@ const Hero = () => {
             </div>
 
             <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
-              <div className="w-12 h-12 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold text-lg">5</div>
+              <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">5</div>
               <div className="text-center">
                 <p className="text-lg md:text-xl font-semibold text-foreground">EA Copyer Dua Arah</p>
                 <p className="text-base font-semibold text-amber-200">Rp 1.850.000</p>
@@ -108,7 +109,7 @@ const Hero = () => {
             </div>
 
             <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
-              <div className="w-12 h-12 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold text-lg">6</div>
+              <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">6</div>
               <div className="text-center">
                 <p className="text-lg md:text-xl font-semibold text-foreground">Akun Challenge Gratis ProFirm Two Step</p>
                 <p className="text-base font-semibold text-amber-200">$5,000 (akun challenge)</p>
