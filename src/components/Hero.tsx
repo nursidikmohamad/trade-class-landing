@@ -94,9 +94,10 @@ const Hero = () => {
 
           <div className="bg-background/60 border border-border rounded-xl p-6 shadow-lg backdrop-blur-sm text-lg md:text-xl text-muted-foreground">
             <p className="leading-relaxed text-center text-white">
-              Di kelas ini, kita kupas tuntas <span className="italic text-amber-300">sisi gelap dunia funding</span>: pola psikologi
-              yang digunakan profit firm, <span className="italic text-amber-300">jebakan aturan yang tak terlihat</span>, dan bagaimana
-              mengubah mindset serta sistem Anda agar konsisten lolos dan menikmati payout.
+              Di kelas ini, saya bahas tuntas rahasia permainan di industri ProFirm. Saya juga akan
+              mengungkap pola jebakan tak kasat mata yang diselipkan secara sistem. Karena hanya
+              dengan mengetahui urutan permainan ini, lulus ProFirm dan payout bukan hal yang
+              mustahil dicapai.
             </p>
           </div>
         </div>
