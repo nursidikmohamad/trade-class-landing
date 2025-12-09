@@ -40,7 +40,6 @@ const Hero = () => {
           <span className="block mt-4 text-3xl md:text-4xl lg:text-5xl text-amber-300">
             Tapi Funding Kamu Tetap <span className="underline decoration-amber-400 decoration-4">Gagal?</span>
           </span>
-          <span className="block mt-4 text-sm text-muted-foreground max-w-xl mx-auto">(Ini bukan soal kemampuan — ini soal strategi, psikologi, dan jebakan funding yang jarang diajarkan.)</span>
         </h1>
 
         <div className="max-w-2xl mx-auto mb-10 space-y-4">
