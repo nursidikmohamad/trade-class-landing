@@ -23,6 +23,46 @@ const Hero = () => {
       <div className="absolute bottom-20 right-1/3 w-2 h-2 bg-yellow-400 rounded-full opacity-60"></div>
       <div className="absolute top-1/2 right-10 w-3 h-3 bg-yellow-500 rounded-full opacity-30"></div>
 
+      {/* Subtle candlestick pattern animation (background) */}
+      <div className="candles-svg z-0" aria-hidden="true">
+        <svg className="w-full h-full" viewBox="0 0 2000 600" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="candleGrad" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#cfcfcf" stopOpacity="0.6" />
+            </linearGradient>
+          </defs>
+
+          <g className="candles-track" transform="translate(0,60)">
+            {/* repeated small groups to create a scrolling pattern */}
+            {Array.from({ length: 30 }).map((_, i) => {
+              const h = 40 + (i % 7) * 18;
+              const body = Math.max(12, h - 12);
+              const x = i * 58;
+              return (
+                // eslint-disable-next-line react/no-unescaped-entities
+                <g key={i} className="candle" transform={`translate(${x}, ${250 - h})`}>
+                  <rect x={10} y={0} width={6} height={h} rx={2} fill="url(#candleGrad)" />
+                  <rect x={12} y={Math.max(0, (h - body) / 2)} width={2} height={body} rx={1} fill="#999" opacity="0.9" />
+                </g>
+              );
+            })}
+            {/* duplicate sequence for continuous scroll */}
+            {Array.from({ length: 30 }).map((_, i) => {
+              const h = 40 + (i % 7) * 18;
+              const body = Math.max(12, h - 12);
+              const x = (i + 30) * 58;
+              return (
+                <g key={`dup-${i}`} className="candle" transform={`translate(${x}, ${250 - h})`}>
+                  <rect x={10} y={0} width={6} height={h} rx={2} fill="url(#candleGrad)" />
+                  <rect x={12} y={Math.max(0, (h - body) / 2)} width={2} height={body} rx={1} fill="#999" opacity="0.9" />
+                </g>
+              );
+            })}
+          </g>
+        </svg>
+      </div>
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
