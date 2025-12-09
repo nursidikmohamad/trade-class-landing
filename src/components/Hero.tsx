@@ -97,8 +97,7 @@ const Hero = () => {
             <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/30 hover:scale-105 transition-transform duration-200">
               <div className="w-12 h-12 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold text-lg">1</div>
               <div className="text-center">
-                <p className="text-lg md:text-xl font-semibold text-foreground">Mengupas Sisi Gelap Industri Prop Firm</p>
-                <p className="text-base text-muted-foreground">Pelajari jebakan aturan dan psikologi yang sering bikin challenge gagal.</p>
+                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">Rp 2.350.000</p>
               </div>
             </div>
 
