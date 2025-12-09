@@ -33,9 +33,14 @@ const Hero = () => {
         </p>
 
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
-          Bayangkan… Anda sudah belajar ke sana–sini, tapi Funding tetap gagal
-          <br />
-          <span className="text-primary">Pelajari Sisi Gelap Funding & Raih Payout</span>
+          <span className="block text-2xl md:text-3xl lg:text-4xl text-foreground/90">Kamu sudah belajar, <span className="text-primary">disiplin</span>,</span>
+          <span className="block text-2xl md:text-3xl lg:text-4xl text-foreground/90">Kamu sudah belajar, <span className="text-primary">Psikologi Trading</span></span>
+          <span className="block text-2xl md:text-3xl lg:text-4xl text-foreground/90">Kamu sudah kuasai semua pola</span>
+
+          <span className="block mt-4 text-3xl md:text-4xl lg:text-5xl text-amber-300">
+            Tapi Funding Kamu Tetap <span className="underline decoration-amber-400 decoration-4">Gagal?</span>
+          </span>
+          <span className="block mt-4 text-sm text-muted-foreground max-w-xl mx-auto">(Ini bukan soal kemampuan — ini soal strategi, psikologi, dan jebakan funding yang jarang diajarkan.)</span>
         </h1>
 
         <div className="max-w-2xl mx-auto mb-10 space-y-4">
