@@ -17,11 +17,18 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Notify Lovable webhook
+      - name: Notify Lovable webhook (log response)
         if: ${{ secrets.LOVABLE_WEBHOOK_URL != '' }}
         run: |
           echo "Notifying Lovable..."
-          curl -sSf -X POST -H "Content-Type: application/json" \
-            -d '{"ref":"main","status":"built"}' "${{ secrets.LOVABLE_WEBHOOK_URL }}"
+          PAYLOAD='{"ref":"main","status":"built"}'
+          # Send request, capture HTTP status and response body for debugging
+          HTTP_CODE=$(curl -s -o /tmp/lovable_response_body.txt -w "%{http_code}" -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "${{ secrets.LOVABLE_WEBHOOK_URL }}" || echo "000")
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body:" || true
+          cat /tmp/lovable_response_body.txt || true
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "::warning::Lovable webhook returned HTTP $HTTP_CODE"
+          fi
         env:
           NODE_ENV: production
