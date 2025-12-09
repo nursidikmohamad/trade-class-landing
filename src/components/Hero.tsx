@@ -112,14 +112,18 @@ const Hero = () => {
               <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">6</div>
               <div className="text-center">
                 <p className="text-lg md:text-xl font-semibold text-foreground">Akun Challenge Gratis ProFirm Two Step</p>
-                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">$5,000 (akun challenge)</p>
+                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">$5,000</p>
               </div>
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <p className="font-extrabold text-2xl md:text-3xl">TOTAL VALUE: <span className="text-amber-200">Rp. 7.700.000</span></p>
-            <p className="text-muted-foreground">Biaya Kelas: klik tombol <span className="font-semibold">Daftar & Bayar</span> atau <span className="font-semibold">Bayar Sekarang</span> untuk menuju pembayaran.</p>
+          <div className="mt-6 flex flex-col items-center text-center gap-3">
+            <p className="font-extrabold text-lg md:text-2xl">TOTAL VALUE:</p>
+            <p className="text-amber-200">
+              <span className="inline-block align-middle mr-2">Rp.</span>
+              <span className="inline-block align-middle text-2xl md:text-3xl font-extrabold">7.700.000</span>
+            </p>
+            <p className="text-muted-foreground max-w-xl">Biaya Kelas: klik tombol <span className="font-semibold">Daftar & Bayar</span> atau <span className="font-semibold">Bayar Sekarang</span> untuk menuju pembayaran.</p>
           </div>
           
           <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
