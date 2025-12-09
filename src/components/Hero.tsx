@@ -9,6 +9,11 @@ const Hero = () => {
     document.getElementById("video")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const goToPayment = () => {
+    // Placeholder: arahkan ke halaman pembayaran atau anchor pembayaran
+    window.location.href = "/pembayaran";
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800">
       {/* Decorative Dots */}
@@ -28,15 +33,23 @@ const Hero = () => {
         </p>
 
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
-          Bongkar Sisi Gelap Trading Prop Firm <br />
-          <span className="text-primary">Raih Profit Konsisten</span>
+          Bayangkan… Anda sudah belajar ke sana–sini, tapi Funding tetap gagal
+          <br />
+          <span className="text-primary">Pelajari Sisi Gelap Funding & Raih Payout</span>
         </h1>
 
-        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-          Belajar trading dari mentor berpengalaman dengan metode yang sudah teruji.
-          Fokus pada manajemen risiko, psikologi, dan strategi yang realistis untuk
-          performa jangka panjang.
-        </p>
+        <div className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 space-y-4">
+          <p>
+            Anda menonton ratusan video, ikut berbagai kelas, membeli strategi,
+            dan mencoba metode yang dianggap aman — namun setiap challenge hasilnya
+            tetap sama: overtrade, mental hancur, atau akun hangus saat hampir payout.
+          </p>
+          <p>
+            Di kelas ini, kita kupas tuntas sisi gelap dunia funding: pola psikologi
+            yang digunakan profit firm, jebakan aturan yang tak terlihat, dan bagaimana
+            mengubah mindset serta sistem Anda agar konsisten lolos dan menikmati payout.
+          </p>
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
@@ -44,7 +57,7 @@ const Hero = () => {
             onClick={scrollToForm}
             className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
           >
-            Daftar Sekarang
+            Daftar & Bayar
           </Button>
 
           <Button
@@ -53,8 +66,32 @@ const Hero = () => {
             onClick={scrollToVideo}
             className="text-lg px-8 py-6 border-2 hover:-translate-y-1 transition-all"
           >
-            Lihat Preview Kelas
+            Pelajari Lebih Lanjut
           </Button>
+
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={goToPayment}
+            className="text-lg px-6 py-4 border-2 hover:-translate-y-1 transition-all hidden sm:inline-flex"
+          >
+            Bayar Sekarang
+          </Button>
+        </div>
+
+        {/* Benefits / Offer details */}
+        <div className="mt-10 max-w-3xl mx-auto bg-muted/40 rounded-lg p-6 text-left text-sm md:text-base">
+          <h3 className="text-foreground font-semibold mb-3">Apa yang Anda Dapatkan Saat Bergabung:</h3>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 list-decimal ml-5">
+            <li>Tools auto SnD — Rp 2.350.000</li>
+            <li>Calculate Risk Management — Rp 950.000</li>
+            <li>Akses Tools Journal Trading — Rp 450.000</li>
+            <li>Akses Journal Strategi Scalping Gold — Rp 850.000</li>
+            <li>EA Copyer Dua Arah — Rp 1.850.000</li>
+            <li>Akun Challenge Gratis ProFirm Two Step $5000</li>
+          </ul>
+          <p className="mt-4 font-bold">TOTAL VALUE: Rp. 7.700.000</p>
+          <p className="mt-2 text-muted-foreground">Biaya Kelas: klik tombol <span className="font-semibold">Daftar & Bayar</span> atau <span className="font-semibold">Bayar Sekarang</span> untuk menuju pembayaran.</p>
         </div>
 
         {/* Stats */}
