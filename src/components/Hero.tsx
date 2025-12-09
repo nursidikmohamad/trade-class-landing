@@ -71,8 +71,8 @@ const Hero = () => {
             <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/30 hover:scale-105 transition-transform duration-200">
               <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">1</div>
               <div className="text-center">
+                <p className="text-lg md:text-xl font-semibold text-foreground">Tools auto SnD</p>
                 <p className="text-2xl md:text-3xl font-extrabold text-amber-200">Rp 2.350.000</p>
-                <p className="mt-1 text-sm text-muted-foreground">Tools auto SnD</p>
               </div>
             </div>
 
