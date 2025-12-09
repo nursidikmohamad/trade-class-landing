@@ -1,9 +1,12 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
   const scrollToForm = () => {
     document.getElementById("daftar")?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const navigate = useNavigate();
 
   const scrollToVideo = () => {
     document.getElementById("video")?.scrollIntoView({ behavior: "smooth" });
@@ -169,10 +172,10 @@ const Hero = () => {
           <div className="mt-6 flex justify-center">
             <Button
               size="lg"
-              onClick={scrollToForm}
+              onClick={() => navigate('/register')}
               className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
             >
-              Daftar & Bayar
+              Daftar Sekarang
             </Button>
           </div>
         </div>
