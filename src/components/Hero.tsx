@@ -164,34 +164,15 @@ const Hero = () => {
               <span className="inline-block align-middle mr-2">Rp.</span>
               <span className="inline-block align-middle text-2xl md:text-3xl font-extrabold">7.700.000</span>
             </p>
-            <p className="text-muted-foreground max-w-xl">Biaya Kelas: klik tombol <span className="font-semibold">Daftar & Bayar</span> atau <span className="font-semibold">Bayar Sekarang</span> untuk menuju pembayaran.</p>
           </div>
           
-          <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="mt-6 flex justify-center">
             <Button
               size="lg"
               onClick={scrollToForm}
               className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
             >
               Daftar & Bayar
-            </Button>
-
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={scrollToVideo}
-              className="text-lg px-8 py-6 border-2 hover:-translate-y-1 transition-all"
-            >
-              Pelajari Lebih Lanjut
-            </Button>
-
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={goToPayment}
-              className="text-lg px-6 py-4 border-2 hover:-translate-y-1 transition-all hidden sm:inline-flex"
-            >
-              Bayar Sekarang
             </Button>
           </div>
         </div>
