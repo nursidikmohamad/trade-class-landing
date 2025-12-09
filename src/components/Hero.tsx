@@ -96,8 +96,10 @@ const Hero = () => {
             <div className="flex items-start gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/30 hover:scale-105 transition-transform duration-200">
               <div className="flex-none w-12 h-12 rounded-full bg-amber-400 text-indigo-900 flex items-center justify-center font-semibold text-lg">1</div>
               <div>
-                <p className="text-lg md:text-xl font-semibold text-foreground">Tools auto SnD</p>
-                <p className="text-base font-semibold text-amber-200">Rp 2.350.000</p>
+                <p className="text-lg md:text-xl font-semibold text-foreground">Ketahuilah Bahwa Ini bukan</p>
+                <p className="text-lg md:text-xl font-semibold text-primary">Sistem Tradingmu Yang Salah</p>
+                <p className="text-lg md:text-xl text-foreground">Tapi Karena Kamu Belum Tahu</p>
+                <p className="text-lg md:text-xl font-semibold text-amber-200">Sisi Gelap Di Industri Prop Firm</p>
               </div>
             </div>
 
