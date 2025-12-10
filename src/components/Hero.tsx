@@ -1,9 +1,21 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Hero = () => {
   const scrollToForm = () => {
     document.getElementById("daftar")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const navigate = useNavigate();
+
+  const handleNavigateClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // log untuk debugging mobile tap behavior and fallback
+    // eslint-disable-next-line no-console
+    console.log("Hero: Daftar Sekarang clicked", { x: e.clientX, y: e.clientY });
+
+    // Prevent default anchor navigation and use react-router navigate as a reliable fallback
+    e.preventDefault();
+    navigate("/register");
   };
 
   return (
@@ -260,7 +272,7 @@ const Hero = () => {
               size="lg"
               className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
             >
-              <Link to="/register" className="inline-block">
+              <Link to="/register" className="inline-block" onClick={handleNavigateClick}>
                 Daftar Sekarang
               </Link>
             </Button>
