@@ -41,7 +41,7 @@ const RegistrationForm = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const validation = formSchema.safeParse(formData);
@@ -57,13 +57,10 @@ const RegistrationForm = () => {
     setIsLoading(true);
 
     try {
-      // generate token di client
       const registrationToken =
         globalThis.crypto && "randomUUID" in globalThis.crypto
           ? globalThis.crypto.randomUUID()
-          : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random()
-            .toString(36)
-            .slice(2)}`;
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
       const payload = {
         name: formData.nama.trim(),
@@ -75,10 +72,9 @@ const RegistrationForm = () => {
 
       const { error } = await supabase
         .from("registrations")
-        .insert(payload);
+        .insert([payload]); // ✅ pakai array
 
       if (error) {
-        console.error("Supabase insert error:", error);
         toast({
           title: "Error",
           description: error.message || "Gagal menyimpan data. Silakan coba lagi.",
@@ -92,19 +88,24 @@ const RegistrationForm = () => {
         description: "Mengarahkan ke halaman konfirmasi pembayaran...",
       });
 
-      navigate(`/konfirmasi-pembayaran?reg=${registrationToken}`);
+      // ✅ reset state dulu
       setFormData(initialState);
+      setIsLoading(false);
+
+      // ✅ lalu navigasi
+      navigate(`/konfirmasi-pembayaran?reg=${registrationToken}`, {
+        replace: true,
+      });
     } catch (err: any) {
-      console.error("Unexpected error:", err);
       toast({
         title: "Error",
         description: "Terjadi kesalahan tak terduga. Silakan coba lagi.",
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <section id="daftar" className="py-20 bg-card">

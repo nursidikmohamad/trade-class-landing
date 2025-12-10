@@ -69,7 +69,6 @@ const KonfirmasiPembayaran = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isValid, setIsValid] = useState(false);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [settings, setSettings] = useState<SiteSettings | null>(null);
@@ -77,6 +76,24 @@ const KonfirmasiPembayaran = () => {
   const [senderAccountNumber, setSenderAccountNumber] = useState("");
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  /** =========================
+   *  FIX mobile blank/black frame
+   *  ========================= */
+  useEffect(() => {
+    // 1) reset posisi scroll
+    window.scrollTo(0, 0);
+
+    // 2) trigger repaint ringan (aman, membantu kasus Chrome mobile)
+    const body = document.body;
+    const prev = body.style.webkitTransform;
+    body.style.webkitTransform = "translateZ(0)";
+    const t = window.setTimeout(() => {
+      body.style.webkitTransform = prev;
+    }, 0);
+
+    return () => window.clearTimeout(t);
+  }, []);
 
   /** Cleanup preview URL */
   useEffect(() => {
@@ -175,7 +192,7 @@ const KonfirmasiPembayaran = () => {
   };
 
   /** Submit flow */
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!registrationToken) {
@@ -235,7 +252,7 @@ const KonfirmasiPembayaran = () => {
         return;
       }
 
-      // 2) Ambil public URL (bucket kamu harus public atau punya policy read)
+      // 2) Ambil public URL
       const { data: urlData } = supabase.storage
         .from(BUCKET)
         .getPublicUrl(filePath);

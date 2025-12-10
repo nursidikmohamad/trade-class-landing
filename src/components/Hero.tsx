@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
-
-
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
   const scrollToForm = () => {
@@ -172,16 +170,15 @@ const Hero = () => {
           </div>
           
           <div className="mt-6 flex justify-center">
-            <Link to="/register">
-              <Button
-                type="button"
-                size="lg"
-                className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
-              >
-                Daftar Sekarang
-              </Button>
-            </Link>
+            <Button
+              size="lg"
+              onClick={() => navigate('/register')}
+              className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+            >
+              Daftar Sekarang
+            </Button>
           </div>
+        </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto mt-16 pt-8 border-t border-border">
