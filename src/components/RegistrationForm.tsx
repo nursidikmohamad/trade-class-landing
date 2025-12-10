@@ -83,10 +83,10 @@ const RegistrationForm = () => {
         return;
       }
 
-      toast({
-        title: "Pendaftaran Berhasil!",
-        description: "Mengarahkan ke halaman konfirmasi pembayaran...",
-      });
+      // sukses insert
+      navigate(`/konfirmasi-pembayaran?reg=${registrationToken}`, { replace: true });
+      setFormData(initialState);
+
 
       // ✅ reset state dulu
       setFormData(initialState);
