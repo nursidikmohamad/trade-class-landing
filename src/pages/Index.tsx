@@ -1,7 +1,7 @@
 import Hero from "@/components/Hero";
 import VideoSection from "@/components/VideoSection";
 import Features from "@/components/Features";
-// import RegistrationForm from "@/components/RegistrationForm";
+//import RegistrationForm from "@/components/RegistrationForm";
 import Footer from "@/components/Footer";
 
 const Index = () => {
