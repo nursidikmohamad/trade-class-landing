@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Send, CheckCircle } from "lucide-react";
+import { Send } from "lucide-react";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -14,8 +15,8 @@ const formSchema = z.object({
 });
 
 const RegistrationForm = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     nama: "",
@@ -46,12 +47,16 @@ const RegistrationForm = () => {
 
     setIsLoading(true);
     
-    const { error } = await supabase.from("registrations").insert({
-      name: formData.nama.trim(),
-      email: formData.email.trim(),
-      phone: formData.whatsapp.trim(),
-      experience: formData.pengalaman || null,
-    });
+    const { data, error } = await supabase
+      .from("registrations")
+      .insert({
+        name: formData.nama.trim(),
+        email: formData.email.trim(),
+        phone: formData.whatsapp.trim(),
+        experience: formData.pengalaman || null,
+      })
+      .select("registration_token")
+      .single();
 
     if (error) {
       toast({
@@ -64,34 +69,15 @@ const RegistrationForm = () => {
     }
     
     setIsLoading(false);
-    setIsSubmitted(true);
     
     toast({
       title: "Pendaftaran Berhasil!",
-      description: "Tim kami akan menghubungi Anda dalam 24 jam"
+      description: "Mengarahkan ke halaman konfirmasi pembayaran..."
     });
-  };
 
-  if (isSubmitted) {
-    return (
-      <section id="daftar" className="py-20 bg-card">
-        <div className="container mx-auto px-6">
-          <div className="max-w-xl mx-auto text-center p-12 bg-secondary border-4 border-primary">
-            <CheckCircle className="w-20 h-20 text-primary mx-auto mb-6" />
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              Pendaftaran Berhasil!
-            </h2>
-            <p className="text-muted-foreground text-lg mb-6">
-              Terima kasih telah mendaftar. Tim kami akan menghubungi Anda melalui WhatsApp dalam 24 jam ke depan.
-            </p>
-            <p className="text-primary font-mono">
-              Cek email Anda untuk informasi lebih lanjut
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+    // Redirect to payment confirmation page with token
+    navigate(`/konfirmasi-pembayaran?reg=${data.registration_token}`);
+  };
 
   return (
     <section id="daftar" className="py-20 bg-card">

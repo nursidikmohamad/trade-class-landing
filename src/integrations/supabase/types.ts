@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      payment_confirmations: {
+        Row: {
+          class_price: number
+          created_at: string
+          id: string
+          payment_proof_url: string
+          registration_token: string
+          sender_account_number: string
+          updated_at: string
+          verification_status: string
+        }
+        Insert: {
+          class_price: number
+          created_at?: string
+          id?: string
+          payment_proof_url: string
+          registration_token: string
+          sender_account_number: string
+          updated_at?: string
+          verification_status?: string
+        }
+        Update: {
+          class_price?: number
+          created_at?: string
+          id?: string
+          payment_proof_url?: string
+          registration_token?: string
+          sender_account_number?: string
+          updated_at?: string
+          verification_status?: string
+        }
+        Relationships: []
+      }
       registrations: {
         Row: {
           created_at: string
@@ -22,6 +55,7 @@ export type Database = {
           id: string
           name: string
           phone: string
+          registration_token: string | null
         }
         Insert: {
           created_at?: string
@@ -30,6 +64,7 @@ export type Database = {
           id?: string
           name: string
           phone: string
+          registration_token?: string | null
         }
         Update: {
           created_at?: string
@@ -38,6 +73,7 @@ export type Database = {
           id?: string
           name?: string
           phone?: string
+          registration_token?: string | null
         }
         Relationships: []
       }
