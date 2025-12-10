@@ -1,5 +1,7 @@
+import { useEffect, useState, type MouseEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
+
 
 const Hero = () => {
   const scrollToForm = () => {
@@ -8,15 +10,52 @@ const Hero = () => {
 
   const navigate = useNavigate();
 
-  const handleNavigateClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // log untuk debugging mobile tap behavior and fallback
-    // eslint-disable-next-line no-console
-    console.log("Hero: Daftar Sekarang clicked", { x: e.clientX, y: e.clientY });
-
-    // Prevent default anchor navigation and use react-router navigate as a reliable fallback
+  const handleNavigateClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     navigate("/register");
   };
+
+  // ✅ SIMULASI popup (latihan, bukan data asli)
+  const DEMO = [
+    { name: "Adit  ", action: "Baru Saja Mendaftar" },
+    { name: "Rio ", action: "Baru Saja Mendaftar" },
+    { name: "Bayu", action: "Baru Saja Mendaftar" },
+    { name: "Fikri", action: "Baru Saja Mendaftar" },
+    { name: "Andre", action: "Baru Saja Mendaftar" },
+    { name: "Hamdan", action: "Baru Saja Mendaftar" },
+    { name: "Ismanto", action: "Baru Saja Mendaftar" },
+    { name: "Anton", action: "Baru Saja Mendaftar" },
+    { name: "David", action: "Baru Saja Mendaftar" },
+  ];
+
+  const [spOpen, setSpOpen] = useState(false);
+  const [spText, setSpText] = useState("");
+
+  useEffect(() => {
+    const rand = (min: number, max: number) =>
+      Math.floor(Math.random() * (max - min + 1)) + min;
+
+    let hideT: number | null = null;
+    let loopT: number | null = null;
+
+    const showOne = () => {
+      const item = DEMO[rand(0, DEMO.length - 1)];
+      setSpText(`${item.name}  ${item.action}`);
+      setSpOpen(true);
+
+      if (hideT) window.clearTimeout(hideT);
+      hideT = window.setTimeout(() => setSpOpen(false), 4500);
+
+      loopT = window.setTimeout(showOne, rand(8000, 14000));
+    };
+
+    loopT = window.setTimeout(showOne, rand(2000, 4000));
+
+    return () => {
+      if (hideT) window.clearTimeout(hideT);
+      if (loopT) window.clearTimeout(loopT);
+    };
+  }, []);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#050406] via-[#070708] to-[#0b0b0d]">
@@ -27,7 +66,7 @@ const Hero = () => {
       <div className="absolute bottom-20 right-1/3 w-2 h-2 bg-yellow-400 rounded-full opacity-60" />
       <div className="absolute top-1/2 right-10 w-3 h-3 bg-yellow-500 rounded-full opacity-30" />
 
-      {/* Subtle candlestick pattern animation (background) */}
+      {/* Candlestick background */}
       <div className="candles-svg z-0" aria-hidden="true">
         <svg
           className="w-full h-full"
@@ -46,7 +85,6 @@ const Hero = () => {
               const h = 40 + (i % 7) * 18;
               const body = Math.max(12, h - 12);
               const x = i * 58;
-
               return (
                 <g
                   key={`c-${i}`}
@@ -78,7 +116,6 @@ const Hero = () => {
               const h = 40 + (i % 7) * 18;
               const body = Math.max(12, h - 12);
               const x = (i + 30) * 58;
-
               return (
                 <g
                   key={`c-dup-${i}`}
@@ -109,8 +146,31 @@ const Hero = () => {
         </svg>
       </div>
 
-      {/* Overlay */}
+      {/* Overlay (FIX: backdrop-blur-sm, bukan backdrop-none-sm) */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+
+      {/* ✅ Logo statis (posisi kiri atas, gak ganggu layout tengah) */}
+      <div className="absolute top-10 left-10 z-20 flex items-center gap-4">
+        <div className="relative">
+          <div className="absolute -inset-2 rounded-2xl bg-amber-400/15 blur-xl" />
+          <img
+            src="/logo.png"
+            alt="Logo Markas Profirm"
+            className="w-16 h-16 md:w-20 md:h-20 object-contain bg-transparent p-0 border-0 brightness-125 contrast-125 drop-shadow-[0_0_18px_rgba(255,214,102,0.60)]"
+            onError={(e) => {
+              // kalau logo belum ada di public/logo.png, jangan bikin crash
+              e.currentTarget.style.display = "none";
+            }}
+          />
+        </div>
+
+        <div className="text-left hidden sm:block">
+          <p className="text-foreground font-bold leading-none">
+            Markas Profirm
+          </p>
+          {/* <p className="text-sm text-muted-foreground">TradingClass</p> */}
+        </div>
+      </div>
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 py-20 text-center">
@@ -163,96 +223,37 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Benefits / Offer details (cards) */}
         <div className="mt-10 max-w-3xl mx-auto bg-muted/30 rounded-lg p-6 text-left text-sm md:text-base">
           <h3 className="mx-auto text-2xl md:text-3xl lg:text-4xl font-extrabold mb-6 bg-gradient-to-r from-amber-300 via-amber-200 to-white bg-clip-text text-transparent text-center">
             Bonus Yg Anda Dapatkan Saat Mengikuti Kelas.
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/30 hover:scale-105 transition-transform duration-200">
-              <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">
-                1
+            {[
+              { no: 1, title: "Tools auto SnD", price: "Rp 2.350.000" },
+              { no: 2, title: "Calculate Risk Management", price: "Rp 950.000" },
+              { no: 3, title: "Akses Tools Journal Trading", price: "Rp 450.000" },
+              { no: 4, title: "Akses Journal Strategi Scalping Gold", price: "Rp 850.000" },
+              { no: 5, title: "EA Copyer Dua Arah", price: "Rp 1.850.000" },
+              { no: 6, title: "Akun Challenge Gratis ProFirm Two Step", price: "$5,000" },
+            ].map((item) => (
+              <div
+                key={item.no}
+                className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200"
+              >
+                <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">
+                  {item.no}
+                </div>
+                <div className="text-center">
+                  <p className="text-lg md:text-xl font-semibold text-foreground">
+                    {item.title}
+                  </p>
+                  <p className="text-2xl md:text-3xl font-extrabold text-amber-200">
+                    {item.price}
+                  </p>
+                </div>
               </div>
-              <div className="text-center">
-                <p className="text-lg md:text-xl font-semibold text-foreground">
-                  Tools auto SnD
-                </p>
-                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">
-                  Rp 2.350.000
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
-              <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">
-                2
-              </div>
-              <div className="text-center">
-                <p className="text-lg md:text-xl font-semibold text-foreground">
-                  Calculate Risk Management
-                </p>
-                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">
-                  Rp 950.000
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
-              <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">
-                3
-              </div>
-              <div className="text-center">
-                <p className="text-lg md:text-xl font-semibold text-foreground">
-                  Akses Tools Journal Trading
-                </p>
-                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">
-                  Rp 450.000
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
-              <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">
-                4
-              </div>
-              <div className="text-center">
-                <p className="text-lg md:text-xl font-semibold text-foreground">
-                  Akses Journal Strategi Scalping Gold
-                </p>
-                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">
-                  Rp 850.000
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
-              <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">
-                5
-              </div>
-              <div className="text-center">
-                <p className="text-lg md:text-xl font-semibold text-foreground">
-                  EA Copyer Dua Arah
-                </p>
-                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">
-                  Rp 1.850.000
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-4 p-4 rounded-xl shadow-md border border-indigo-700 bg-indigo-900/25 hover:scale-105 transition-transform duration-200">
-              <div className="w-9 h-9 rounded-full bg-gray-400/20 text-gray-300 flex items-center justify-center font-semibold text-base">
-                6
-              </div>
-              <div className="text-center">
-                <p className="text-lg md:text-xl font-semibold text-foreground">
-                  Akun Challenge Gratis ProFirm Two Step
-                </p>
-                <p className="text-2xl md:text-3xl font-extrabold text-amber-200">
-                  $5,000
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
 
           <div className="mt-6 flex flex-col items-center text-center gap-3">
@@ -265,7 +266,6 @@ const Hero = () => {
             </p>
           </div>
 
-          {/* ✅ Mobile-safe navigation: render Link as the Button child to avoid nesting interactive elements */}
           <div className="mt-6 flex justify-center">
             <Button
               asChild
@@ -279,16 +279,15 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto mt-16 pt-8 border-t border-border">
           <div>
-            <p className="text-3xl md:text-4xl font-bold text-primary">5.000+</p>
-            <p className="text-sm md:text-base text-muted-foreground">
-              Siswa Terdaftar
-            </p>
+            <p className="text-3xl md:text-4xl font-bold text-primary">1427+</p>
+            <p className="text-sm md:text-base text-muted-foreground">Bets 3</p>
           </div>
           <div>
-            <p className="text-3xl md:text-4xl font-bold text-primary">Live</p>
+            <p className="text-3xl md:text-4xl font-bold text-primary">
+              Live Zoom
+            </p>
             <p className="text-sm md:text-base text-muted-foreground">
               Sesi Mingguan
             </p>
@@ -302,7 +301,25 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Scroll Indicator (clickable) */}
+      <div
+        className={[
+          "fixed right-4 top-4 z-[9999] max-w-[320px]",
+          "rounded-2xl border border-amber-400/40",
+          "bg-black/70 backdrop-blur-md shadow-[0_18px_55px_rgba(0,0,0,0.55)]",
+          "px-4 py-3 text-left",
+          "transition-all duration-300",
+          spOpen
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-3 pointer-events-none",
+        ].join(" ")}
+      >
+        <div className="text-[11px] font-extrabold tracking-[0.14em] text-amber-300">
+          UPDATE MEMBER
+        </div>
+        <div className="mt-1 text-sm text-white">{spText}</div>
+      </div>
+
+
       <button
         type="button"
         onClick={scrollToForm}

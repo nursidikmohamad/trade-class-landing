@@ -4,32 +4,32 @@ const features = [
   {
     icon: TrendingUp,
     title: "Strategi Terbukti",
-    description: "Pelajari strategi trading yang sudah teruji dan menghasilkan profit konsisten selama bertahun-tahun"
+    description: "Ikuti pola dan sistem yang dipakai pro firm—biar kamu punya arah jelas sejak hari pertama dan makin yakin buat mulai bareng."
   },
   {
     icon: Shield,
     title: "Manajemen Risiko",
-    description: "Kuasai teknik manajemen risiko untuk melindungi modal dan memaksimalkan keuntungan"
+    description: "Pakai software canggih untuk mengontrol risiko dan menghadapi algoritma pro firm dengan lebih tenang—cocok buat kamu yang siap naik level."
   },
   {
     icon: Users,
     title: "Komunitas Eksklusif",
-    description: "Bergabung dengan komunitas trader aktif untuk berbagi insight dan peluang trading"
+    description: "Masuk komunitas trader aktif yang saling dorong progres—sharing insight, evaluasi, sampai peluang entry bareng."
   },
   {
     icon: BookOpen,
     title: "Materi Komprehensif",
-    description: "Dari analisis teknikal hingga fundamental, semua materi disusun secara sistematis"
+    description: "Materi tersusun rapi dari teknikal sampai fundamental—tinggal ikuti step-by-step dan rasakan progresnya."
   },
   {
     icon: Headphones,
     title: "Support 24/7",
-    description: "Tim support siap membantu menjawab pertanyaan dan kendala Anda kapan saja"
+    description: "Ada tim yang siap bantu kapan saja—biar kamu nggak stuck sendirian dan lebih cepat siap gabung."
   },
   {
     icon: Award,
     title: "Sertifikat Kelulusan",
-    description: "Dapatkan sertifikat resmi setelah menyelesaikan seluruh modul pembelajaran"
+    description: "Selesaikan modul dan dapatkan sertifikat resmi—jadi bukti komitmen sekaligus nilai plus saat kamu sudah siap melangkah lebih jauh."
   }
 ];
 
@@ -42,19 +42,21 @@ const Features = () => {
             Mengapa Memilih Kami
           </p>
           <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
-            Fitur Kelas Trading Kami
+            Visi Kami
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Semua yang Anda butuhkan untuk menjadi trader yang profitable dan konsisten
+            Kami Membangun ekosistem belajar yang terstruktur dan eksklusif—dirancang Khusus Melawan Sistem Algoritma Profirm
           </p>
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
-            <div 
+            <div
               key={index}
-              className="group p-8 bg-card border-2 border-border hover:border-primary transition-all duration-300 hover:-translate-y-2 hover:shadow-lg"
+              className="group relative overflow-hidden rounded-2xl p-8 bg-card/70 border border-primary/25 shadow-lg transition hover:-translate-y-1 hover:shadow-xl hover:border-primary/50"
             >
+
+
               <div className="w-14 h-14 bg-primary/10 border-2 border-primary flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
                 <feature.icon className="w-7 h-7 text-primary group-hover:text-primary-foreground transition-colors" />
               </div>

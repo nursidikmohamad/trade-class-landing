@@ -4,6 +4,16 @@ import { useNavigate } from "react-router-dom";
 import { User, Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -20,7 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Users, Youtube, TrendingUp, Save, AlertCircle, CreditCard, Settings } from "lucide-react";
+import { LogOut, Users, Youtube, TrendingUp, Save, AlertCircle, CreditCard, Settings, Edit, Trash, CheckCircle } from "lucide-react";
 
 interface Registration {
   id: string;
@@ -28,6 +38,7 @@ interface Registration {
   email: string;
   phone: string;
   experience: string;
+  status?: string;
   created_at: string;
   registration_token: string;
 }
@@ -49,6 +60,8 @@ interface SiteSettings {
   account_number: string;
   class_price: string;
   whatsapp_number: string;
+  bank_name?: string;
+  discount_percent?: string;
 }
 
 const Admin = () => {
@@ -65,8 +78,17 @@ const Admin = () => {
     account_number: "",
     class_price: "",
     whatsapp_number: "",
+    bank_name: "",
+    discount_percent: "",
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [editingRegistrant, setEditingRegistrant] = useState<Registration | null>(null);
+  const [isRegistrantDialogOpen, setIsRegistrantDialogOpen] = useState(false);
+  const [editRegistrantForm, setEditRegistrantForm] = useState<Partial<Registration>>({});
+
+  const [editingPayment, setEditingPayment] = useState<PaymentConfirmation | null>(null);
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+  const [editPaymentForm, setEditPaymentForm] = useState<Partial<PaymentConfirmation>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"registrations" | "payments" | "settings">("registrations");
 
@@ -181,22 +203,25 @@ const Admin = () => {
 
   const handleSaveSettings = async () => {
     setIsSaving(true);
-    
-    const updates = Object.entries(settings).map(([key, value]) => ({
+    // Upsert settings so new keys (e.g. bank_name, discount_percent) are created if missing
+    const entries = Object.entries(settings).map(([key, value]) => ({
       key,
-      value: value || "",
+      // Ensure values are stored as strings in site_settings.value
+      value: String(value ?? ""),
       updated_at: new Date().toISOString(),
     }));
 
-    for (const update of updates) {
-      const { error } = await supabase
-        .from("site_settings")
-        .update({ value: update.value, updated_at: update.updated_at })
-        .eq("key", update.key);
+    // `upsert` with onConflict on `key` will insert if not exists, update otherwise
+    const { error: upsertErr } = await supabase
+      .from("site_settings")
+      .upsert(entries, { onConflict: "key" });
 
-      if (error) {
-        console.error(`Error updating ${update.key}:`, error);
-      }
+
+    if (upsertErr) {
+      console.error("Error upserting settings:", upsertErr);
+      toast({ title: "Error", description: "Gagal menyimpan pengaturan", variant: "destructive" });
+      setIsSaving(false);
+      return;
     }
 
     toast({
@@ -224,6 +249,147 @@ const Admin = () => {
         title: "Berhasil!",
         description: "Status verifikasi berhasil diupdate",
       });
+      fetchData();
+    }
+  };
+
+  const handleOpenEditRegistrant = (reg: Registration) => {
+    setEditingRegistrant(reg);
+    setEditRegistrantForm({
+      name: reg.name,
+      email: reg.email,
+      phone: reg.phone,
+      experience: reg.experience,
+    });
+    setIsRegistrantDialogOpen(true);
+  };
+
+  const handleSaveRegistrant = async () => {
+    if (!editingRegistrant) return;
+    const payload: Partial<Registration> = {
+      name: editRegistrantForm.name || editingRegistrant.name,
+      email: editRegistrantForm.email || editingRegistrant.email,
+      phone: editRegistrantForm.phone || editingRegistrant.phone,
+      experience: editRegistrantForm.experience ?? editingRegistrant.experience,
+      // updated_at handled server-side or can be set here
+    };
+
+    const { error } = await supabase
+      .from("registrations")
+      .update(payload)
+      .eq("id", editingRegistrant.id);
+
+    if (error) {
+      toast({ title: "Error", description: "Gagal mengupdate pendaftar", variant: "destructive" });
+    } else {
+      toast({ title: "Berhasil", description: "Data pendaftar berhasil diupdate" });
+      setIsRegistrantDialogOpen(false);
+      setEditingRegistrant(null);
+      fetchData();
+    }
+  };
+
+  const handleDeleteRegistrant = async (id: string) => {
+    const ok = window.confirm("Hapus pendaftar ini? Tindakan tidak dapat dibatalkan.");
+    if (!ok) return;
+
+    const { error } = await supabase.from("registrations").delete().eq("id", id);
+    if (error) {
+      console.error("Delete registration error:", error);
+      toast({ title: "Error", description: error.message || "Gagal menghapus pendaftar", variant: "destructive" });
+    } else {
+      toast({ title: "Berhasil", description: "Pendaftar dihapus" });
+      fetchData();
+    }
+  };
+
+  const handleConfirmRegistrant = async (reg: Registration) => {
+    const ok = window.confirm(`Konfirmasi pendaftar ${reg.name}?`);
+    if (!ok) return;
+
+    // Update registration status
+    const { error } = await supabase
+      .from("registrations")
+      .update({ status: "confirmed", updated_at: new Date().toISOString() })
+      .eq("id", reg.id);
+
+    if (error) {
+      console.error("Error confirming registrant (registrations update):", error);
+      // Fallback: if registrations table doesn't have `status` or RLS blocks update, try to at least mark payment as verified
+      toast({ title: "Perhatian", description: "Gagal mengubah status pendaftar. Mencoba menandai pembayaran sebagai terverifikasi saja.", variant: "destructive" });
+      const { error: fallbackErr } = await supabase
+        .from("payment_confirmations")
+        .update({ verification_status: "verified", updated_at: new Date().toISOString() })
+        .eq("registration_token", reg.registration_token);
+
+      if (fallbackErr) {
+        console.error("Fallback error updating payment confirmations:", fallbackErr);
+        toast({ title: "Error", description: "Gagal mengkonfirmasi pendaftar atau menandai pembayaran. Periksa migrasi DB dan policy RLS.", variant: "destructive" });
+        return;
+      }
+
+      toast({ title: "Berhasil sebagian", description: "Pembayaran ditandai terverifikasi. Tambahkan kolom `status` pada tabel `registrations` (ALTER TABLE) agar konfirmasi tersimpan pada pendaftar." });
+      fetchData();
+      return;
+    }
+
+    // Also mark any related payment confirmation as verified
+    const { error: payErr } = await supabase
+      .from("payment_confirmations")
+      .update({ verification_status: "verified", updated_at: new Date().toISOString() })
+      .eq("registration_token", reg.registration_token);
+
+    if (payErr) {
+      console.error("Error updating payment confirmations:", payErr);
+      // not blocking
+    }
+
+    toast({ title: "Berhasil", description: "Pendaftar telah dikonfirmasi" });
+    fetchData();
+  };
+
+  const handleOpenEditPayment = (p: PaymentConfirmation) => {
+    setEditingPayment(p);
+    setEditPaymentForm({
+      sender_account_number: p.sender_account_number,
+      class_price: p.class_price,
+    });
+    setIsPaymentDialogOpen(true);
+  };
+
+  const handleSavePayment = async () => {
+    if (!editingPayment) return;
+
+    const payload: Partial<PaymentConfirmation> = {
+      sender_account_number: editPaymentForm.sender_account_number ?? editingPayment.sender_account_number,
+      class_price: editPaymentForm.class_price ?? editingPayment.class_price,
+    };
+
+    const { error } = await supabase
+      .from("payment_confirmations")
+      .update(payload)
+      .eq("id", editingPayment.id);
+
+    if (error) {
+      toast({ title: "Error", description: "Gagal mengupdate konfirmasi", variant: "destructive" });
+    } else {
+      toast({ title: "Berhasil", description: "Konfirmasi pembayaran berhasil diupdate" });
+      setIsPaymentDialogOpen(false);
+      setEditingPayment(null);
+      fetchData();
+    }
+  };
+
+  const handleDeletePayment = async (id: string) => {
+    const ok = window.confirm("Hapus konfirmasi pembayaran ini? Tindakan tidak dapat dibatalkan.");
+    if (!ok) return;
+
+    const { error } = await supabase.from("payment_confirmations").delete().eq("id", id);
+    if (error) {
+      console.error("Delete payment error:", error);
+      toast({ title: "Error", description: error.message || "Gagal menghapus konfirmasi", variant: "destructive" });
+    } else {
+      toast({ title: "Berhasil", description: "Konfirmasi pembayaran dihapus" });
       fetchData();
     }
   };
@@ -269,6 +435,25 @@ const Admin = () => {
     return (
       <span className={`px-2 py-1 text-xs font-bold border rounded ${styles[status] || styles.pending}`}>
         {labels[status] || status}
+      </span>
+    );
+  };
+
+  const getRegistrantStatusBadge = (status?: string) => {
+    const st = status || "pending";
+    const mapStyles: Record<string, string> = {
+      pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
+      confirmed: "bg-green-100 text-green-800 border-green-300",
+      cancelled: "bg-red-100 text-red-800 border-red-300",
+    };
+    const mapLabels: Record<string, string> = {
+      pending: "Menunggu",
+      confirmed: "Terkonfirmasi",
+      cancelled: "Dibatalkan",
+    };
+    return (
+      <span className={`px-2 py-1 text-xs font-bold border rounded ${mapStyles[st] || mapStyles.pending}`}>
+        {mapLabels[st] || st}
       </span>
     );
   };
@@ -391,7 +576,9 @@ const Admin = () => {
                       <TableHead className="font-bold">Email</TableHead>
                       <TableHead className="font-bold">WhatsApp</TableHead>
                       <TableHead className="font-bold">Pengalaman</TableHead>
+                      <TableHead className="font-bold">Status</TableHead>
                       <TableHead className="font-bold">Tanggal Daftar</TableHead>
+                      <TableHead className="font-bold">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -401,7 +588,26 @@ const Admin = () => {
                         <TableCell>{reg.email}</TableCell>
                         <TableCell>{reg.phone}</TableCell>
                         <TableCell>{getExperienceLabel(reg.experience)}</TableCell>
+                        <TableCell>{getRegistrantStatusBadge(reg.status)}</TableCell>
                         <TableCell>{formatDate(reg.created_at)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Button size="sm" variant="ghost" onClick={() => handleOpenEditRegistrant(reg)}>
+                              <Edit className="w-4 h-4" />
+                              <span className="sr-only">Edit</span>
+                            </Button>
+                            {reg.status !== 'confirmed' && (
+                              <Button size="sm" variant="outline" onClick={() => handleConfirmRegistrant(reg)}>
+                                <CheckCircle className="w-4 h-4" />
+                                <span className="sr-only">Confirm</span>
+                              </Button>
+                            )}
+                            <Button size="sm" variant="destructive" onClick={() => handleDeleteRegistrant(reg.id)}>
+                              <Trash className="w-4 h-4" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -461,19 +667,31 @@ const Admin = () => {
                         </TableCell>
                         <TableCell>{getStatusBadge(payment.verification_status)}</TableCell>
                         <TableCell>
-                          <Select
-                            value={payment.verification_status}
-                            onValueChange={(value) => handleUpdateVerificationStatus(payment.id, value)}
-                          >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="pending">Menunggu</SelectItem>
-                              <SelectItem value="verified">Terverifikasi</SelectItem>
-                              <SelectItem value="rejected">Ditolak</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <div className="flex items-center gap-2">
+                            <Select
+                              value={payment.verification_status}
+                              onValueChange={(value) => handleUpdateVerificationStatus(payment.id, value)}
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="pending">Menunggu</SelectItem>
+                                <SelectItem value="verified">Terverifikasi</SelectItem>
+                                <SelectItem value="rejected">Ditolak</SelectItem>
+                              </SelectContent>
+                            </Select>
+
+                            <Button size="sm" variant="ghost" onClick={() => handleOpenEditPayment(payment)}>
+                              <Edit className="w-4 h-4" />
+                              <span className="sr-only">Edit</span>
+                            </Button>
+
+                            <Button size="sm" variant="destructive" onClick={() => handleDeletePayment(payment.id)}>
+                              <Trash className="w-4 h-4" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -536,6 +754,17 @@ const Admin = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-foreground mb-2">
+                    Nama Bank
+                  </label>
+                  <Input
+                    value={settings.bank_name || ""}
+                    onChange={(e) => setSettings({ ...settings, bank_name: e.target.value })}
+                    placeholder="Contoh: BCA / Mandiri"
+                    className="h-12 border-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-foreground mb-2">
                     Harga Kelas (Rp)
                   </label>
                   <Input
@@ -545,6 +774,19 @@ const Admin = () => {
                     placeholder="500000"
                     className="h-12 border-2"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-foreground mb-2">
+                    Diskon (%)
+                  </label>
+                  <Input
+                    type="number"
+                    value={settings.discount_percent || ""}
+                    onChange={(e) => setSettings({ ...settings, discount_percent: e.target.value })}
+                    placeholder="20"
+                    className="h-12 border-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Masukkan persentase diskon (angka saja, contoh: 20 untuk 20%).</p>
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-foreground mb-2">
@@ -577,6 +819,75 @@ const Admin = () => {
           </div>
         )}
       </main>
+
+      {/* Edit Registrant Dialog */}
+      <Dialog open={isRegistrantDialogOpen} onOpenChange={setIsRegistrantDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Pendaftar</DialogTitle>
+            <DialogDescription>Ubah data pendaftar di sini</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-2">
+            <div>
+              <label className="block text-sm font-bold text-foreground mb-2">Nama</label>
+              <Input value={editRegistrantForm.name || ""} onChange={(e) => setEditRegistrantForm({ ...editRegistrantForm, name: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-foreground mb-2">Email</label>
+              <Input value={editRegistrantForm.email || ""} onChange={(e) => setEditRegistrantForm({ ...editRegistrantForm, email: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-foreground mb-2">WhatsApp</label>
+              <Input value={editRegistrantForm.phone || ""} onChange={(e) => setEditRegistrantForm({ ...editRegistrantForm, phone: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-foreground mb-2">Pengalaman</label>
+              <select value={editRegistrantForm.experience || ""} onChange={(e) => setEditRegistrantForm({ ...editRegistrantForm, experience: e.target.value })} className="w-full h-10 bg-card border-2 border-border">
+                <option value="">Pilih pengalaman</option>
+                <option value="pemula">Pemula</option>
+                <option value="menengah">Menengah (1-2 tahun)</option>
+                <option value="mahir">Mahir (&gt;2 tahun)</option>
+              </select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <DialogClose>
+              <Button variant="outline">Batal</Button>
+            </DialogClose>
+            <Button onClick={handleSaveRegistrant}>Simpan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Payment Dialog */}
+      <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Konfirmasi</DialogTitle>
+            <DialogDescription>Ubah data konfirmasi pembayaran</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-2">
+            <div>
+              <label className="block text-sm font-bold text-foreground mb-2">No Rek Pengirim</label>
+              <Input value={editPaymentForm.sender_account_number || ""} onChange={(e) => setEditPaymentForm({ ...editPaymentForm, sender_account_number: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-foreground mb-2">Harga Kelas (Rp)</label>
+              <Input type="number" value={editPaymentForm.class_price ? String(editPaymentForm.class_price) : ""} onChange={(e) => setEditPaymentForm({ ...editPaymentForm, class_price: Number(e.target.value) })} />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <DialogClose>
+              <Button variant="outline">Batal</Button>
+            </DialogClose>
+            <Button onClick={handleSavePayment}>Simpan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

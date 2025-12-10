@@ -37,7 +37,7 @@ const Footer = () => {
               </li>
               <li>
                 <a href="/auth" className="text-muted-foreground hover:text-primary transition-colors">
-                  Admin Login
+                  {/* Admin Login */}
                 </a>
               </li>
             </ul>
@@ -65,7 +65,7 @@ const Footer = () => {
         
         <div className="border-t border-border mt-8 pt-8 text-center">
           <p className="text-muted-foreground text-sm">
-            © 2024 TradingClass. All rights reserved.
+            © 2023 Markas Profirm. All rights reserved.
           </p>
         </div>
       </div>

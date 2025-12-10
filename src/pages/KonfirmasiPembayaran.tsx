@@ -1,23 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
-import { z } from "zod";
+// This page was removed. Confirmation functionality moved into the register form component.
+// Kept as placeholder to avoid build errors if referenced accidentally.
 
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import {
-  CreditCard,
-  Upload,
-  CheckCircle,
-  AlertCircle,
-  TrendingUp,
-} from "lucide-react";
+const KonfirmasiPembayaran = () => null;
 
-/** =========================
- *  Schema
- *  ========================= */
-const paymentSchema = z.object({
+export default KonfirmasiPembayaran;
   senderAccountNumber: z
     .string()
     .trim()
