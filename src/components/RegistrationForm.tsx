@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { z } from "zod";
+
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Send } from "lucide-react";
-import { z } from "zod";
 
 const formSchema = z.object({
   nama: z.string().trim().min(1, "Nama wajib diisi").max(100),
@@ -14,69 +15,95 @@ const formSchema = z.object({
   pengalaman: z.string().optional(),
 });
 
+type FormState = z.infer<typeof formSchema>;
+
+const initialState: FormState = {
+  nama: "",
+  email: "",
+  whatsapp: "",
+  pengalaman: "",
+};
+
 const RegistrationForm = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    nama: "",
-    email: "",
-    whatsapp: "",
-    pengalaman: ""
-  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData(prev => ({
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState<FormState>(initialState);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const validation = formSchema.safeParse(formData);
     if (!validation.success) {
       toast({
         title: "Error",
-        description: validation.error.errors[0].message,
-        variant: "destructive"
+        description: validation.error.errors[0]?.message ?? "Data tidak valid",
+        variant: "destructive",
       });
       return;
     }
 
     setIsLoading(true);
-    
-    const { data, error } = await supabase
-      .from("registrations")
-      .insert({
+
+    try {
+      // generate token di client
+      const registrationToken =
+        globalThis.crypto && "randomUUID" in globalThis.crypto
+          ? globalThis.crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random()
+            .toString(36)
+            .slice(2)}`;
+
+      const payload = {
         name: formData.nama.trim(),
         email: formData.email.trim(),
         phone: formData.whatsapp.trim(),
-        experience: formData.pengalaman || null,
-      })
-      .select("registration_token")
-      .single();
+        experience: formData.pengalaman ? formData.pengalaman : null,
+        registration_token: registrationToken,
+      };
 
-    if (error) {
+      const { error } = await supabase
+        .from("registrations")
+        .insert(payload);
+
+      if (error) {
+        console.error("Supabase insert error:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Gagal menyimpan data. Silakan coba lagi.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Pendaftaran Berhasil!",
+        description: "Mengarahkan ke halaman konfirmasi pembayaran...",
+      });
+
+      navigate(`/konfirmasi-pembayaran?reg=${registrationToken}`);
+      setFormData(initialState);
+    } catch (err: any) {
+      console.error("Unexpected error:", err);
       toast({
         title: "Error",
-        description: "Gagal menyimpan data. Silakan coba lagi.",
-        variant: "destructive"
+        description: "Terjadi kesalahan tak terduga. Silakan coba lagi.",
+        variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
-      return;
     }
-    
-    setIsLoading(false);
-    
-    toast({
-      title: "Pendaftaran Berhasil!",
-      description: "Mengarahkan ke halaman konfirmasi pembayaran..."
-    });
-
-    // Redirect to payment confirmation page with token
-    navigate(`/konfirmasi-pembayaran?reg=${data.registration_token}`);
   };
 
   return (
@@ -92,40 +119,55 @@ const RegistrationForm = () => {
               Mulai Perjalanan Trading Anda
             </h2>
             <p className="text-muted-foreground text-lg mb-8">
-              Isi formulir di samping untuk mendaftar. Tim kami akan menghubungi Anda untuk informasi lebih lanjut tentang kelas dan jadwal pembelajaran.
+              Isi formulir di samping untuk mendaftar. Tim kami akan menghubungi Anda
+              untuk informasi lebih lanjut tentang kelas dan jadwal pembelajaran.
             </p>
-            
+
             <div className="space-y-4">
               <div className="flex items-center gap-4 p-4 bg-secondary border-2 border-border">
-                <div className="w-10 h-10 bg-primary text-primary-foreground flex items-center justify-center font-bold">1</div>
+                <div className="w-10 h-10 bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                  1
+                </div>
                 <div>
                   <p className="font-bold text-foreground">Isi Formulir</p>
-                  <p className="text-sm text-muted-foreground">Lengkapi data diri Anda</p>
+                  <p className="text-sm text-muted-foreground">
+                    Lengkapi data diri Anda
+                  </p>
                 </div>
               </div>
+
               <div className="flex items-center gap-4 p-4 bg-secondary border-2 border-border">
-                <div className="w-10 h-10 bg-primary text-primary-foreground flex items-center justify-center font-bold">2</div>
+                <div className="w-10 h-10 bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                  2
+                </div>
                 <div>
                   <p className="font-bold text-foreground">Konfirmasi WhatsApp</p>
-                  <p className="text-sm text-muted-foreground">Tim kami akan menghubungi Anda</p>
+                  <p className="text-sm text-muted-foreground">
+                    Tim kami akan menghubungi Anda
+                  </p>
                 </div>
               </div>
+
               <div className="flex items-center gap-4 p-4 bg-secondary border-2 border-border">
-                <div className="w-10 h-10 bg-primary text-primary-foreground flex items-center justify-center font-bold">3</div>
+                <div className="w-10 h-10 bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                  3
+                </div>
                 <div>
                   <p className="font-bold text-foreground">Mulai Belajar</p>
-                  <p className="text-sm text-muted-foreground">Akses materi dan mulai trading</p>
+                  <p className="text-sm text-muted-foreground">
+                    Akses materi dan mulai trading
+                  </p>
                 </div>
               </div>
             </div>
           </div>
-          
+
           {/* Right Side - Form */}
           <div className="bg-secondary border-4 border-border p-8 shadow-xl">
             <h3 className="text-2xl font-bold text-foreground mb-6">
               Formulir Pendaftaran
             </h3>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-bold text-foreground mb-2">
@@ -142,7 +184,7 @@ const RegistrationForm = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-bold text-foreground mb-2">
                   Email *
@@ -158,7 +200,7 @@ const RegistrationForm = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-bold text-foreground mb-2">
                   Nomor WhatsApp *
@@ -174,14 +216,14 @@ const RegistrationForm = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-bold text-foreground mb-2">
                   Pengalaman Trading
                 </label>
                 <select
                   name="pengalaman"
-                  value={formData.pengalaman}
+                  value={formData.pengalaman ?? ""}
                   onChange={handleChange}
                   className="w-full bg-card border-2 border-border focus:border-primary h-12 px-4 text-foreground"
                 >
@@ -191,9 +233,9 @@ const RegistrationForm = () => {
                   <option value="mahir">Mahir (lebih dari 2 tahun)</option>
                 </select>
               </div>
-              
-              <Button 
-                type="submit" 
+
+              <Button
+                type="submit"
                 size="lg"
                 className="w-full h-14 text-lg font-bold shadow-lg hover:shadow-xl transition-all"
                 disabled={isLoading}
@@ -210,7 +252,7 @@ const RegistrationForm = () => {
                   </span>
                 )}
               </Button>
-              
+
               <p className="text-xs text-muted-foreground text-center">
                 Dengan mendaftar, Anda menyetujui syarat dan ketentuan yang berlaku
               </p>

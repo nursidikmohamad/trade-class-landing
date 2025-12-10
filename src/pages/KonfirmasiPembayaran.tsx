@@ -1,52 +1,114 @@
-import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams, Link } from "react-router-dom";
+import { z } from "zod";
+
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { CreditCard, Upload, CheckCircle, AlertCircle, TrendingUp } from "lucide-react";
-import { z } from "zod";
+import {
+  CreditCard,
+  Upload,
+  CheckCircle,
+  AlertCircle,
+  TrendingUp,
+} from "lucide-react";
 
+/** =========================
+ *  Schema
+ *  ========================= */
 const paymentSchema = z.object({
-  senderAccountNumber: z.string().trim().min(5, "No rekening minimal 5 digit").max(30),
+  senderAccountNumber: z
+    .string()
+    .trim()
+    .min(5, "No rekening minimal 5 digit")
+    .max(30),
 });
 
+type PaymentInput = z.infer<typeof paymentSchema>;
+
 interface SiteSettings {
-  account_holder_name: string;
-  account_number: string;
-  class_price: string;
-  whatsapp_number: string;
+  account_holder_name?: string;
+  account_number?: string;
+  class_price?: string;
+  whatsapp_number?: string;
 }
+
+/** =========================
+ *  Helpers
+ *  ========================= */
+const BUCKET = "payment-proofs";
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+
+const formatPrice = (price?: string) => {
+  const num = Number(price || 0);
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(num);
+};
+
+const getFileExt = (filename: string) => {
+  const ext = filename.split(".").pop()?.toLowerCase();
+  if (ext === "jpg") return "jpeg";
+  if (ext === "jpeg") return "jpeg";
+  if (ext === "png") return "png";
+  return "png";
+};
 
 const KonfirmasiPembayaran = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const { toast } = useToast();
-  const registrationToken = searchParams.get("reg");
+
+  const registrationToken = useMemo(
+    () => searchParams.get("reg"),
+    [searchParams]
+  );
 
   const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [settings, setSettings] = useState<SiteSettings | null>(null);
+
   const [senderAccountNumber, setSenderAccountNumber] = useState("");
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  /** Cleanup preview URL */
   useEffect(() => {
-    if (!registrationToken) {
-      setIsLoading(false);
-      return;
-    }
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
-    const fetchData = async () => {
-      // Verify registration token exists
-      const { data: registration, error: regError } = await supabase
-        .from("registrations")
-        .select("id")
-        .eq("registration_token", registrationToken)
-        .maybeSingle();
+  /** Load token validity + site settings */
+  useEffect(() => {
+    let active = true;
 
-      if (regError || !registration) {
+    const run = async () => {
+      if (!registrationToken) {
+        if (!active) return;
+        setIsValid(false);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+
+      // 1) Validasi token via RPC
+      const { data: tokenOk, error: tokenErr } = await supabase.rpc(
+        "check_registration_token" as any,
+        { token: registrationToken }
+      );
+
+      if (!active) return;
+
+      if (tokenErr || !tokenOk) {
+        console.error("Token check error:", tokenErr);
         setIsValid(false);
         setIsLoading(false);
         return;
@@ -54,63 +116,85 @@ const KonfirmasiPembayaran = () => {
 
       setIsValid(true);
 
-      // Fetch site settings
-      const { data: settingsData, error: settingsError } = await supabase
+      // 2) Ambil site settings
+      const { data, error } = await supabase
         .from("site_settings")
         .select("key, value");
 
-      if (settingsError) {
-        console.error("Error fetching settings:", settingsError);
-      } else if (settingsData) {
-        const settingsMap = settingsData.reduce((acc, item) => {
-          acc[item.key as keyof SiteSettings] = item.value;
+      if (!active) return;
+
+      if (error) {
+        console.error("Error fetching settings:", error);
+        setSettings({});
+      } else {
+        const map = (data || []).reduce((acc, item) => {
+          (acc as any)[item.key] = item.value;
           return acc;
         }, {} as SiteSettings);
-        setSettings(settingsMap);
+
+        setSettings(map);
       }
 
       setIsLoading(false);
     };
 
-    fetchData();
+    run();
+
+    return () => {
+      active = false;
+    };
   }, [registrationToken]);
 
+  /** Handle file input */
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!["image/jpeg", "image/png"].includes(file.type)) {
-        toast({
-          title: "Format tidak valid",
-          description: "Hanya file JPG atau PNG yang diterima",
-          variant: "destructive",
-        });
-        return;
-      }
+    if (!file) return;
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "File terlalu besar",
-          description: "Maksimal ukuran file 5MB",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setPaymentProof(file);
-      setPreviewUrl(URL.createObjectURL(file));
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast({
+        title: "Format tidak valid",
+        description: "Hanya file JPG atau PNG yang diterima",
+        variant: "destructive",
+      });
+      return;
     }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "File terlalu besar",
+        description: "Maksimal ukuran file 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setPaymentProof(file);
+
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(URL.createObjectURL(file));
   };
 
+  /** Submit flow */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const validation = paymentSchema.safeParse({ senderAccountNumber });
+    if (!registrationToken) {
+      toast({
+        title: "Error",
+        description: "Token pendaftaran tidak ditemukan",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const validation = paymentSchema.safeParse({
+      senderAccountNumber,
+    } satisfies PaymentInput);
+
     if (!validation.success) {
       toast({
         title: "Error",
-        description: validation.error.errors[0].message,
+        description: validation.error.errors[0]?.message ?? "Data tidak valid",
         variant: "destructive",
       });
       return;
@@ -127,72 +211,106 @@ const KonfirmasiPembayaran = () => {
 
     setIsSubmitting(true);
 
-    // Upload payment proof
-    const fileExt = paymentProof.name.split(".").pop();
-    const fileName = `${registrationToken}-${Date.now()}.${fileExt}`;
+    try {
+      // 1) Upload ke Storage
+      const ext = getFileExt(paymentProof.name);
+      const filePath = `${registrationToken}-${Date.now()}.${ext}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from("payment-proofs")
-      .upload(fileName, paymentProof);
+      const { error: uploadError } = await supabase.storage
+        .from(BUCKET)
+        .upload(filePath, paymentProof, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: paymentProof.type,
+        });
 
-    if (uploadError) {
-      console.error("Upload error:", uploadError);
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        toast({
+          title: "Error",
+          description:
+            uploadError.message || "Gagal mengupload bukti pembayaran",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // 2) Ambil public URL (bucket kamu harus public atau punya policy read)
+      const { data: urlData } = supabase.storage
+        .from(BUCKET)
+        .getPublicUrl(filePath);
+
+      const publicUrl = urlData?.publicUrl;
+
+      if (!publicUrl) {
+        toast({
+          title: "Error",
+          description: "Gagal mendapatkan URL bukti pembayaran",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // 3) Insert konfirmasi pembayaran
+      const classPrice = Number(settings?.class_price || 0);
+
+      const { error: insertError } = await supabase
+        .from("payment_confirmations")
+        .insert({
+          registration_token: registrationToken,
+          sender_account_number: senderAccountNumber.trim(),
+          class_price: classPrice,
+          payment_proof_url: publicUrl,
+        });
+
+      if (insertError) {
+        console.error("Insert error:", insertError);
+        toast({
+          title: "Error",
+          description:
+            insertError.message || "Gagal menyimpan konfirmasi pembayaran",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Berhasil!",
+        description: "Konfirmasi pembayaran berhasil dikirim",
+      });
+
+      // 4) Buka WA Admin
+      const whatsappNumber = settings?.whatsapp_number || "6281234567890";
+      const message = encodeURIComponent(
+        `Halo, saya sudah melakukan pembayaran untuk pendaftaran kelas trading.\n\n` +
+        `No Rekening Pengirim: ${senderAccountNumber.trim()}\n` +
+        `Token: ${registrationToken}`
+      );
+
+      window.open(
+        `https://wa.me/${whatsappNumber}?text=${message}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+      // Reset UI
+      setSenderAccountNumber("");
+      setPaymentProof(null);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    } catch (err: any) {
+      console.error("Unexpected error:", err);
       toast({
         title: "Error",
-        description: "Gagal mengupload bukti pembayaran",
+        description: "Terjadi kesalahan. Silakan coba lagi.",
         variant: "destructive",
       });
+    } finally {
       setIsSubmitting(false);
-      return;
     }
-
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from("payment-proofs")
-      .getPublicUrl(fileName);
-
-    // Insert payment confirmation
-    const { error: insertError } = await supabase
-      .from("payment_confirmations")
-      .insert({
-        registration_token: registrationToken,
-        sender_account_number: senderAccountNumber.trim(),
-        class_price: parseFloat(settings?.class_price || "0"),
-        payment_proof_url: urlData.publicUrl,
-      });
-
-    if (insertError) {
-      console.error("Insert error:", insertError);
-      toast({
-        title: "Error",
-        description: "Gagal menyimpan konfirmasi pembayaran",
-        variant: "destructive",
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
-    toast({
-      title: "Berhasil!",
-      description: "Konfirmasi pembayaran berhasil dikirim",
-    });
-
-    // Redirect to WhatsApp
-    const whatsappNumber = settings?.whatsapp_number || "6281234567890";
-    const message = encodeURIComponent(
-      `Halo, saya sudah melakukan pembayaran untuk pendaftaran kelas trading.\n\nNo Rekening Pengirim: ${senderAccountNumber}\nToken: ${registrationToken}`
-    );
-    window.location.href = `https://wa.me/${whatsappNumber}?text=${message}`;
   };
 
-  const formatPrice = (price: string) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(parseFloat(price || "0"));
-  };
-
+  /** Loading */
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -201,90 +319,110 @@ const KonfirmasiPembayaran = () => {
     );
   }
 
+  /** Invalid token */
   if (!registrationToken || !isValid) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-foreground mb-2">Token Tidak Valid</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">
+            Token Tidak Valid
+          </h1>
           <p className="text-muted-foreground mb-6">
             Link konfirmasi pembayaran tidak valid atau sudah kadaluarsa.
           </p>
-          <a href="/register" className="text-primary hover:underline">
+          <Link to="/#daftar" className="text-primary hover:underline">
             Kembali ke halaman pendaftaran
-          </a>
+          </Link>
         </div>
       </div>
     );
   }
 
+  /** UI */
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card border-b-4 border-border">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-8 h-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">Trading Class</span>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-6 py-12">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-8">
-            <CreditCard className="w-16 h-16 text-primary mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+    <div className="min-h-screen bg-background py-12 px-6">
+      <div className="container mx-auto max-w-4xl">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary border-2 border-border mb-4">
+            <TrendingUp className="w-4 h-4 text-primary" />
+            <span className="text-sm font-mono text-primary uppercase tracking-widest">
               Konfirmasi Pembayaran
-            </h1>
-            <p className="text-muted-foreground">
-              Silakan transfer ke rekening di bawah ini dan upload bukti pembayaran
-            </p>
+            </span>
           </div>
 
-          {/* Payment Info */}
-          <div className="bg-secondary border-4 border-border p-6 mb-8">
-            <h2 className="text-lg font-bold text-foreground mb-4">Informasi Rekening Tujuan</h2>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center py-2 border-b border-border">
-                <span className="text-muted-foreground">Nama Pemilik</span>
-                <span className="font-bold text-foreground">
+          <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-3">
+            Selesaikan Pembayaran Anda
+          </h1>
+          <p className="text-muted-foreground">
+            Upload bukti transfer dan isi nomor rekening pengirim.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Detail pembayaran */}
+          <div className="bg-secondary border-4 border-border p-8 shadow-xl h-fit">
+            <div className="flex items-center gap-3 mb-6">
+              <CreditCard className="w-6 h-6 text-primary" />
+              <h2 className="text-xl font-bold text-foreground">
+                Detail Pembayaran
+              </h2>
+            </div>
+
+            <div className="space-y-4">
+              <div className="p-4 bg-card border-2 border-border">
+                <p className="text-sm text-muted-foreground">
+                  Nama Pemilik Rekening
+                </p>
+                <p className="text-lg font-bold text-foreground">
                   {settings?.account_holder_name || "-"}
-                </span>
+                </p>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-border">
-                <span className="text-muted-foreground">Nomor Rekening</span>
-                <span className="font-bold text-foreground font-mono">
+
+              <div className="p-4 bg-card border-2 border-border">
+                <p className="text-sm text-muted-foreground">Nomor Rekening</p>
+                <p className="text-lg font-bold text-foreground">
                   {settings?.account_number || "-"}
-                </span>
+                </p>
               </div>
-              <div className="flex justify-between items-center py-2">
-                <span className="text-muted-foreground">Total Pembayaran</span>
-                <span className="font-bold text-primary text-xl">
-                  {formatPrice(settings?.class_price || "0")}
-                </span>
+
+              <div className="p-4 bg-card border-2 border-border">
+                <p className="text-sm text-muted-foreground">Harga Kelas</p>
+                <p className="text-2xl font-bold text-primary">
+                  {formatPrice(settings?.class_price)}
+                </p>
+              </div>
+
+              <div className="p-4 bg-card border-2 border-border">
+                <p className="text-sm text-muted-foreground">
+                  Token Pendaftaran
+                </p>
+                <p className="font-mono text-foreground break-all">
+                  {registrationToken}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Payment Form */}
-          <form onSubmit={handleSubmit} className="bg-card border-4 border-border p-6">
-            <h2 className="text-lg font-bold text-foreground mb-6">Form Konfirmasi</h2>
+          {/* Form konfirmasi */}
+          <div className="bg-secondary border-4 border-border p-8 shadow-xl">
+            <div className="flex items-center gap-3 mb-6">
+              <CheckCircle className="w-6 h-6 text-primary" />
+              <h2 className="text-xl font-bold text-foreground">
+                Form Konfirmasi
+              </h2>
+            </div>
 
-            <input type="hidden" value={registrationToken} />
-            <input type="hidden" value={settings?.class_price || "0"} />
-
-            <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-bold text-foreground mb-2">
                   Nomor Rekening Pengirim *
                 </label>
                 <Input
-                  type="text"
-                  placeholder="Masukkan nomor rekening pengirim"
                   value={senderAccountNumber}
                   onChange={(e) => setSenderAccountNumber(e.target.value)}
-                  className="w-full h-12 border-2"
+                  placeholder="Masukkan nomor rekening pengirim"
+                  className="h-12 border-2"
                   maxLength={30}
                   required
                 />
@@ -292,75 +430,65 @@ const KonfirmasiPembayaran = () => {
 
               <div>
                 <label className="block text-sm font-bold text-foreground mb-2">
-                  Harga Kelas
+                  Bukti Pembayaran *
                 </label>
-                <Input
-                  type="text"
-                  value={formatPrice(settings?.class_price || "0")}
-                  className="w-full h-12 border-2 bg-secondary"
-                  readOnly
-                />
-              </div>
 
-              <div>
-                <label className="block text-sm font-bold text-foreground mb-2">
-                  Upload Bukti Pembayaran *
-                </label>
-                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors">
+                <div className="border-2 border-dashed border-border p-6 text-center bg-card">
                   <input
                     type="file"
-                    accept=".jpg,.jpeg,.png"
+                    accept="image/jpeg,image/png"
                     onChange={handleFileChange}
                     className="hidden"
                     id="payment-proof"
                   />
-                  <label htmlFor="payment-proof" className="cursor-pointer">
-                    {previewUrl ? (
-                      <div>
-                        <img
-                          src={previewUrl}
-                          alt="Preview"
-                          className="max-h-48 mx-auto mb-4 rounded"
-                        />
-                        <p className="text-sm text-primary">Klik untuk ganti gambar</p>
-                      </div>
-                    ) : (
-                      <div>
-                        <Upload className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                        <p className="text-foreground font-medium mb-2">
-                          Klik untuk upload bukti pembayaran
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Format: JPG, PNG (max 5MB)
-                        </p>
-                      </div>
-                    )}
+                  <label
+                    htmlFor="payment-proof"
+                    className="cursor-pointer inline-flex flex-col items-center gap-2"
+                  >
+                    <Upload className="w-8 h-8 text-primary" />
+                    <span className="text-sm text-muted-foreground">
+                      Klik untuk upload (JPG/PNG, max 5MB)
+                    </span>
                   </label>
                 </div>
+
+                {previewUrl && (
+                  <div className="mt-4">
+                    <img
+                      src={previewUrl}
+                      alt="Preview bukti pembayaran"
+                      className="w-full max-h-60 object-contain border-2 border-border bg-card"
+                    />
+                    <p className="text-xs text-muted-foreground text-center mt-2">
+                      Klik area upload untuk ganti gambar
+                    </p>
+                  </div>
+                )}
               </div>
 
               <Button
                 type="submit"
                 size="lg"
-                className="w-full h-14 text-lg font-bold"
+                className="w-full h-14 text-lg font-bold shadow-lg hover:shadow-xl transition-all"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">
                     <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground" />
-                    Mengirim...
+                    Memproses...
                   </span>
                 ) : (
-                  <span className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5" />
-                    Konfirmasi Pembayaran
-                  </span>
+                  "Konfirmasi Pembayaran"
                 )}
               </Button>
-            </div>
-          </form>
+
+              <p className="text-xs text-muted-foreground text-center">
+                Setelah terkirim, WhatsApp admin akan terbuka di tab baru.
+              </p>
+            </form>
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
