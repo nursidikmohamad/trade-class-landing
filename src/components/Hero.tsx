@@ -253,17 +253,17 @@ const Hero = () => {
             </p>
           </div>
 
-          {/* ✅ Mobile-safe navigation */}
+          {/* ✅ Mobile-safe navigation: render Link as the Button child to avoid nesting interactive elements */}
           <div className="mt-6 flex justify-center">
-            <Link to="/register" className="inline-block">
-              <Button
-                type="button"
-                size="lg"
-                className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
-              >
+            <Button
+              asChild
+              size="lg"
+              className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+            >
+              <Link to="/register" className="inline-block">
                 Daftar Sekarang
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
 

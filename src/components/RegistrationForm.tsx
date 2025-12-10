@@ -83,19 +83,10 @@ const RegistrationForm = () => {
         return;
       }
 
-      // sukses insert
-      navigate(`/konfirmasi-pembayaran?reg=${registrationToken}`, { replace: true });
-      setFormData(initialState);
-
-
-      // ✅ reset state dulu
+      // sukses insert: reset form, stop loading, lalu navigasi sekali
       setFormData(initialState);
       setIsLoading(false);
-
-      // ✅ lalu navigasi
-      navigate(`/konfirmasi-pembayaran?reg=${registrationToken}`, {
-        replace: true,
-      });
+      navigate(`/konfirmasi-pembayaran?reg=${registrationToken}`, { replace: true });
     } catch (err: any) {
       toast({
         title: "Error",
