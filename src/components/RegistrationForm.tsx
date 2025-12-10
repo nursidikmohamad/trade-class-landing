@@ -98,7 +98,7 @@ const RegistrationForm = () => {
       <div className="container mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           {/* Left Side - Info */}
-          <div>
+          <div className="text-center lg:text-left">
             <p className="text-primary font-mono text-sm uppercase tracking-widest mb-4">
               Daftar Sekarang
             </p>
