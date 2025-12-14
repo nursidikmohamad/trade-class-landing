@@ -59,12 +59,20 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#050406] via-[#070708] to-[#0b0b0d]">
+
+      {/* ✅ OG Image sebagai background (tampil di halaman) */}
+      <img
+        src="/og-image-markas.png"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 z-0 h-full w-full object-cover opacity-25"
+      />
+      <div className="absolute inset-0 z-0 bg-black/55" />
+
       {/* Decorative Dots */}
       <div className="absolute top-20 left-10 w-3 h-3 bg-yellow-500 rounded-full opacity-60" />
-      <div className="absolute top-40 right-20 w-2 h-2 bg-yellow-400 rounded-full opacity-50" />
-      <div className="absolute bottom-40 left-1/4 w-2.5 h-2.5 bg-yellow-500 rounded-full opacity-40" />
-      <div className="absolute bottom-20 right-1/3 w-2 h-2 bg-yellow-400 rounded-full opacity-60" />
-      <div className="absolute top-1/2 right-10 w-3 h-3 bg-yellow-500 rounded-full opacity-30" />
+      ...
+
 
       {/* Candlestick background */}
       <div className="candles-svg z-0" aria-hidden="true">
