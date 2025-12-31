@@ -13,11 +13,7 @@ import DiscountCountdown from "@/components/DiscountCountdown";
 const formSchema = z.object({
   nama: z.string().trim().min(1, "Nama wajib diisi").max(100),
   email: z.string().trim().email("Format email tidak valid").max(255),
-  whatsapp: z
-    .string()
-    .trim()
-    .min(10, "Nomor WhatsApp minimal 10 digit")
-    .max(15),
+  whatsapp: z.string().trim().min(10, "Nomor WhatsApp minimal 10 digit").max(15),
   pengalaman: z.string().optional(),
 });
 
@@ -39,15 +35,6 @@ interface SiteSettings {
   discount_percent?: string;
 }
 
-/** Normalisasi nomor WA: digits only + perbaiki prefix 0/8 -> 62 */
-const normalizeWa = (raw: string) => {
-  const digits = (raw || "").replace(/\D/g, "");
-  if (!digits) return "";
-  if (digits.startsWith("0")) return "62" + digits.slice(1); // 08xx -> 628xx
-  if (digits.startsWith("8")) return "62" + digits; // 8xx -> 628xx
-  return digits; // sudah 62xxxx
-};
-
 const RegistrationForm = () => {
   const { toast } = useToast();
 
@@ -60,56 +47,10 @@ const RegistrationForm = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  useEffect(() => {
-    // load site settings
-    let active = true;
-
-    (async () => {
-      const { data, error } = await supabase
-        .from("site_settings")
-        .select("key, value");
-
-      if (!active) return;
-
-      if (error) {
-        console.error("Error fetching settings:", error);
-        setSettings({});
-        return;
-      }
-
-      const map = (data || []).reduce((acc, item) => {
-        (acc as any)[item.key] = item.value;
-        return acc;
-      }, {} as SiteSettings);
-
-      setSettings(map);
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const formatPrice = (price?: string) => {
-    const num = Number(price || 0);
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(num);
-  };
-
-  const getEffectivePrice = () => {
-    const original = Number(settings?.class_price || 0);
-    const discount = Number(settings?.discount_percent || 0);
-    if (!original) return 0;
-
-    return Math.round(
-      original * (1 - Math.min(Math.max(discount, 0), 100) / 100)
-    );
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -120,15 +61,6 @@ const RegistrationForm = () => {
       toast({
         title: "Error",
         description: validation.error.errors[0]?.message ?? "Data tidak valid",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!senderAccountNumber.trim()) {
-      toast({
-        title: "Error",
-        description: "No Rek Pengirim wajib diisi",
         variant: "destructive",
       });
       return;
@@ -150,8 +82,8 @@ const RegistrationForm = () => {
         registration_token: registrationToken,
       };
 
-      // 1) insert registration
       const { error } = await supabase.from("registrations").insert([payload]);
+
       if (error) {
         toast({
           title: "Error",
@@ -162,13 +94,13 @@ const RegistrationForm = () => {
         return;
       }
 
-      // 2) insert payment_confirmation
+      // insert payment_confirmation with sender account and class price
       const classPrice = Number(settings?.class_price || 0);
       const { error: payErr } = await supabase
         .from("payment_confirmations")
         .insert({
           registration_token: registrationToken,
-          sender_account_number: senderAccountNumber.trim(),
+          sender_account_number: senderAccountNumber.trim() || null,
           class_price: classPrice,
           payment_proof_url: null,
         });
@@ -182,39 +114,23 @@ const RegistrationForm = () => {
         });
       }
 
-      // 3) prepare WA number + message
-      const whatsappNumberRaw = settings?.whatsapp_number || "6285340016675";
-      const whatsappNumber = normalizeWa(whatsappNumberRaw);
-
-      if (!whatsappNumber) {
-        toast({
-          title: "Error",
-          description: "Nomor WhatsApp admin belum valid di pengaturan",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      const text = encodeURIComponent(
-        `Halo, saya sudah mendaftar kelas trading.\n\n` +
-        `Nama: ${payload.name}\n` +
-        `Email: ${payload.email}\n` +
-        `No WA: ${payload.phone}\n` +
-        `No Rek Pengirim: ${senderAccountNumber.trim()}\n` +
-        `Token: ${registrationToken}`
-      );
-
-      // 4) reset UI dulu
+      // sukses insert — open WhatsApp and reset form
       setFormData(initialState);
       setSenderAccountNumber("");
       setIsLoading(false);
 
-      // 5) open WhatsApp Web
-      const url = `https://web.whatsapp.com/send?phone=${whatsappNumber}&text=${text}`;
-      window.open(url, "_blank", "noopener,noreferrer");
+      const whatsappNumber = settings?.whatsapp_number || "6281234567890";
+      const message = encodeURIComponent(
+        `Halo, saya sudah mendaftar kelas trading.\n\nNama: ${payload.name}\nEmail: ${payload.email}\nNo WA: ${payload.phone}\nNo Rek Pengirim: ${senderAccountNumber
+          .trim()}\nToken: ${registrationToken}`
+      );
+
+      window.open(
+        `https://wa.me/${whatsappNumber}?text=${message}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
     } catch (err: any) {
-      console.error("Unexpected error:", err);
       toast({
         title: "Error",
         description: "Terjadi kesalahan tak terduga. Silakan coba lagi.",
@@ -224,25 +140,77 @@ const RegistrationForm = () => {
     }
   };
 
+  useEffect(() => {
+    // load site settings for class price and whatsapp
+    let active = true;
+
+    (async () => {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("key, value");
+
+      if (!active) return;
+
+      if (error) {
+        console.error("Error fetching settings:", error);
+        setSettings({});
+      } else {
+        const map = (data || []).reduce((acc, item) => {
+          (acc as any)[item.key] = item.value;
+          return acc;
+        }, {} as SiteSettings);
+
+        setSettings(map);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const formatPrice = (price?: string) => {
+    const num = Number(price || 0);
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(num);
+  };
+
+  const getEffectivePrice = () => {
+    const original = Number(settings?.class_price || 0);
+    const discount = Number(settings?.discount_percent || 0);
+    if (!original) return 0;
+    const effective = Math.round(
+      original * (1 - Math.min(Math.max(discount, 0), 100) / 100)
+    );
+    return effective;
+  };
+
   return (
     <section id="daftar" className="py-20 bg-card">
       <div className="container mx-auto px-6">
         <div className="max-w-3xl mx-auto">
+          {/* CARD FORM (PARENT RELATIVE AGAR TIMER NEMPEL KE CARD) */}
           <div className="bg-secondary border-4 border-border p-8 shadow-xl relative">
+            {/* TIMER DI TENGAH ATAS CARD (TIDAK MEPET) */}
             <div className="absolute inset-x-0 top-8 flex justify-center">
               <DiscountCountdown
-                hours={1}
+                hours={48}
                 label="Diskon berakhir"
                 storageKey="register_discount_end"
                 className="text-center"
               />
             </div>
 
+            {/* SPACER BIAR JUDUL & ISI FORM TIDAK KETABRAK TIMER */}
             <div className="pt-28">
               <h3 className="text-2xl font-bold text-foreground mb-6">
                 Formulir Pendaftaran
               </h3>
 
+              {/* Informasi pembayaran / instruksi */}
               <div className="mb-6 p-4 bg-card border-2 border-border rounded-lg">
                 <h4 className="text-lg font-semibold text-foreground mb-2">
                   Silakan isi dengan data yang benar
@@ -454,6 +422,7 @@ const RegistrationForm = () => {
                   berlaku
                 </p>
               </form>
+              {/* confirmation moved into main form; no separate card */}
             </div>
           </div>
         </div>

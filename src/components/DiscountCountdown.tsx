@@ -20,7 +20,7 @@ function formatHHMMSS(ms: number) {
 }
 
 export default function DiscountCountdown({
-    hours = 1,
+    hours = 48,
     label = "Diskon berakhir",
     storageKey = "register_discount_end_48h",
     className = "",
